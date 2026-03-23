@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { BookOpen, Globe, Users, Camera, ArrowUpRight } from "lucide-react"
 
-const TALLY_URL = "https://tally.so/r/GxLKWL"
+const TALLY_URLS = {
+  membresia: "https://tally.so/r/GxLKWL?origen=membresia",
+  cursosB1: "https://tally.so/r/GxLKWL?origen=cursos_b1",
+  marca: "https://tally.so/r/GxLKWL?origen=marca",
+}
 
 export function WelcomePortal() {
   return (
@@ -101,7 +105,7 @@ export function WelcomePortal() {
                   asChild
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all group/btn"
                 >
-                  <a href={TALLY_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={TALLY_URLS.membresia} target="_blank" rel="noopener noreferrer">
                     Subir contenido
                     <ArrowUpRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:opacity-100 transition-opacity" strokeWidth={1.5} />
                   </a>
@@ -132,7 +136,7 @@ export function WelcomePortal() {
                   variant="outline" 
                   className="w-full border-secondary/35 text-foreground hover:bg-secondary/12 hover:border-secondary/50 transition-all group/btn"
                 >
-                  <a href={TALLY_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={TALLY_URLS.cursosB1} target="_blank" rel="noopener noreferrer">
                     Subir contenido
                     <ArrowUpRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:opacity-100 transition-opacity" strokeWidth={1.5} />
                   </a>
@@ -163,7 +167,7 @@ export function WelcomePortal() {
                   variant="outline" 
                   className="w-full border-primary/25 text-foreground hover:bg-primary/8 hover:border-primary/40 transition-all group/btn"
                 >
-                  <a href={TALLY_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={TALLY_URLS.marca} target="_blank" rel="noopener noreferrer">
                     Compartir material
                     <ArrowUpRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:opacity-100 transition-opacity" strokeWidth={1.5} />
                   </a>
