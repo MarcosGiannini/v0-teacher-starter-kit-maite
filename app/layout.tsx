@@ -1,14 +1,22 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const cormorant = Cormorant_Garamond({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-serif"
+});
+
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-sans"
+});
 
 export const metadata: Metadata = {
-  title: 'Portal de Bienvenida - Maite',
-  description: 'Centro de creación de tu plataforma',
+  title: 'Portal de Bienvenida - Maite Colodrón | Super Teacher',
+  description: 'Centro de creación de tu plataforma Super Teacher',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -35,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
       <body className="font-sans antialiased">
         {children}
         <Analytics />
