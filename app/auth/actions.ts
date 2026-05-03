@@ -49,10 +49,17 @@ export async function signup(formData: FormData) {
   }
 
   if (data.user) {
-    await supabase.from('profiles').insert({
+    const { error: profileError } = await supabase.from('profiles').insert({
       id: data.user.id,
       full_name: fullName,
     })
+
+    if (profileError) {
+      // El usuario de Auth fue creado pero el perfil falló (ej. RLS sin políticas).
+      // Registramos el error en servidor para diagnóstico.
+      console.error('[Super Teacher] Error al crear perfil:', profileError.message)
+      redirect(`/signup?error=${encodeURIComponent('Cuenta creada pero hubo un error al guardar tu perfil. Contacta al administrador.')}`)
+    }
   }
 
   redirect('/registro-exitoso')
