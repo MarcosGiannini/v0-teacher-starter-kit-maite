@@ -47,7 +47,7 @@ export async function signup(formData: FormData) {
     })
   }
 
-  redirect('/login?message=Revisa tu correo para confirmar tu cuenta')
+  redirect('/registro-exitoso')
 }
 
 export async function logout() {
