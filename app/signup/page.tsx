@@ -22,7 +22,7 @@ export default async function SignupPage({
             Super Teacher
           </h1>
           <p className="text-sm text-muted-foreground">
-            Comienza tu viaje con el alemán
+            Comienza tu viaje con el español
           </p>
         </div>
 
