@@ -47,6 +47,8 @@ export async function GET(request: NextRequest) {
       { status: 503 }
     )
   }
+  // Diagnóstico: confirmar que la clave llega completa al servidor
+  console.log("[Checkout] 🔑 Longitud de la clave:", secretKey.length, "| Prefijo:", secretKey.slice(0, 12))
 
   // --- 4. Obtener email del usuario logueado en Supabase ---
   const supabase = await createClient()
@@ -66,7 +68,8 @@ export async function GET(request: NextRequest) {
 
   // --- 5. Crear sesión de Stripe Checkout ---
   try {
-    const stripe = new Stripe(secretKey, { apiVersion: "2025-04-30.basil" })
+    // Sin apiVersion explícita: usa la versión por defecto del SDK (stripe@22)
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
     console.log(`[Checkout] 🔄 Creando sesión para plan="${plan}", price="${priceId}", email="${customerEmail ?? "none"}"`)
 
