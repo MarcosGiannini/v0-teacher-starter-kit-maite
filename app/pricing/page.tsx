@@ -22,7 +22,7 @@ const plans = [
       "Actualizaciones mensuales de contenido",
     ],
     cta: "Empezar ahora",
-    ctaHref: "https://tally.so/r/GxLKWL?origen=capsulas_a1",
+    ctaHref: "/api/checkout?plan=capsulas-a1",
     variant: "default" as const,
     highlight: false,
   },
@@ -45,7 +45,7 @@ const plans = [
       "Material de examen TELC/Goethe B1",
     ],
     cta: "Quiero este plan",
-    ctaHref: "https://tally.so/r/GxLKWL?origen=cursos_b1_cornelia",
+    ctaHref: "/api/checkout?plan=cursos-b1-cornelia",
     variant: "featured" as const,
     highlight: true,
   },
@@ -68,7 +68,7 @@ const plans = [
       "Preparación intensiva para certificados oficiales",
     ],
     cta: "Solicitar plaza",
-    ctaHref: "https://tally.so/r/GxLKWL?origen=mentorship",
+    ctaHref: "/api/checkout?plan=mentorship",
     variant: "outline" as const,
     highlight: false,
   },
@@ -197,9 +197,9 @@ export default function PricingPage() {
                     ].join(" ")}
                     variant={isFeatured ? "default" : "outline"}
                   >
-                    <a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
+                    <Link href={plan.ctaHref}>
                       {plan.cta}
-                    </a>
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
