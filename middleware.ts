@@ -26,7 +26,23 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refresca la sesión si ha expirado. No eliminar esta llamada.
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const { pathname } = request.nextUrl
+
+  // Ruta protegida: redirige a /login si no hay sesión activa
+  if (!user && pathname.startsWith('/dashboard')) {
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/login'
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // Si ya está logueado, no tiene sentido volver a /login o /signup
+  if (user && (pathname === '/login' || pathname === '/signup')) {
+    const dashboardUrl = request.nextUrl.clone()
+    dashboardUrl.pathname = '/dashboard'
+    return NextResponse.redirect(dashboardUrl)
+  }
 
   return supabaseResponse
 }

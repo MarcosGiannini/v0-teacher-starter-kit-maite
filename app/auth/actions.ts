@@ -49,3 +49,10 @@ export async function signup(formData: FormData) {
 
   redirect('/login?message=Revisa tu correo para confirmar tu cuenta')
 }
+
+export async function logout() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/login')
+}
+}
