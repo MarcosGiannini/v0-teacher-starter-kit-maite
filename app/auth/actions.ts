@@ -9,6 +9,10 @@ export async function login(formData: FormData) {
 
   const supabase = await createClient()
 
+  if (!supabase) {
+    redirect(`/login?error=${encodeURIComponent('Servicio no disponible. Configura Supabase en .env.local.')}`)
+  }
+
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
@@ -34,6 +38,10 @@ export async function signup(formData: FormData) {
 
   const supabase = await createClient()
 
+  if (!supabase) {
+    redirect(`/signup?error=${encodeURIComponent('Servicio no disponible. Configura Supabase en .env.local.')}`)
+  }
+
   const { data, error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
@@ -52,6 +60,6 @@ export async function signup(formData: FormData) {
 
 export async function logout() {
   const supabase = await createClient()
-  await supabase.auth.signOut()
+  if (supabase) await supabase.auth.signOut()
   redirect('/login')
 }

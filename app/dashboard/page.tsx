@@ -7,6 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export default async function DashboardPage() {
   const supabase = await createClient()
 
+  // Sin Supabase configurado no hay sesión posible
+  if (!supabase) {
+    redirect('/login')
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
 
   // Capa de seguridad extra: aunque el middleware ya redirige,
