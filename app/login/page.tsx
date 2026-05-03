@@ -3,8 +3,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { login } from '@/app/auth/actions'
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; message?: string }>
+}) {
+  const { error, message } = await searchParams
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-6">
@@ -31,7 +38,18 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
-            <form className="space-y-4">
+            {message && (
+              <p className="mb-4 rounded-md bg-accent/20 px-3 py-2 text-sm text-accent-foreground">
+                {message}
+              </p>
+            )}
+            {error && (
+              <p className="mb-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </p>
+            )}
+
+            <form action={login} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">
                   Correo electrónico
