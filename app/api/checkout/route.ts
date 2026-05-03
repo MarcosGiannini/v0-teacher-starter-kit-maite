@@ -38,17 +38,30 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // --- 3. Validar clave de Stripe ---
-  const secretKey = process.env.STRIPE_SECRET_KEY
-  if (!secretKey) {
-    console.error("[Checkout] ❌ STRIPE_SECRET_KEY no está configurado en .env.local")
+  // --- 3. Validar y sanear clave de Stripe ---
+  console.log("DEBUG: La clave empieza por:", process.env.STRIPE_SECRET_KEY?.substring(0, 7))
+
+  const rawKey = process.env.STRIPE_SECRET_KEY
+  if (!rawKey || rawKey.trim() === "") {
+    console.error("ERROR: La variable STRIPE_SECRET_KEY está vacía o es undefined")
     return NextResponse.json(
       { error: "Stripe no está configurado. Contacta con el administrador." },
       { status: 503 }
     )
   }
-  // Diagnóstico: confirmar que la clave llega completa al servidor
-  console.log("[Checkout] 🔑 Longitud de la clave:", secretKey.length, "| Prefijo:", secretKey.slice(0, 12))
+
+  // .trim() elimina espacios, tabulaciones y saltos de línea invisibles
+  const secretKey = rawKey.trim()
+
+  if (!secretKey.startsWith("sk_test_") && !secretKey.startsWith("sk_live_")) {
+    console.error("ERROR: STRIPE_SECRET_KEY no tiene el formato esperado (sk_test_... o sk_live_...). Valor actual empieza por:", secretKey.substring(0, 10))
+    return NextResponse.json(
+      { error: "La clave de Stripe tiene un formato inválido." },
+      { status: 503 }
+    )
+  }
+
+  console.log("[Checkout] 🔑 Longitud de la clave (sin espacios):", secretKey.length, "| Prefijo:", secretKey.slice(0, 12))
 
   // --- 4. Obtener email del usuario logueado en Supabase ---
   const supabase = await createClient()
@@ -68,8 +81,8 @@ export async function GET(request: NextRequest) {
 
   // --- 5. Crear sesión de Stripe Checkout ---
   try {
-    // Sin apiVersion explícita: usa la versión por defecto del SDK (stripe@22)
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+    // Usamos secretKey (ya sanitizado con .trim()) — nunca releer process.env aquí
+    const stripe = new Stripe(secretKey)
 
     console.log(`[Checkout] 🔄 Creando sesión para plan="${plan}", price="${priceId}", email="${customerEmail ?? "none"}"`)
 
