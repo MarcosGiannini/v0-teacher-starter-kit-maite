@@ -1,26 +1,26 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-function getEnvVars() {
+function getEnvVars(): { url: string; key: string } | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!url || url === 'your-project-url') {
-    throw new Error(
-      '[Super Teacher] Falta NEXT_PUBLIC_SUPABASE_URL en .env.local\n' +
-      'Encuéntrala en: supabase.com/dashboard → Project Settings → API'
+  if (!url || url === 'your-project-url' || !key || key === 'your-anon-key') {
+    console.warn(
+      '[Super Teacher] ⚠️  Supabase no está configurado.\n' +
+      'Añade los valores reales en .env.local:\n' +
+      '  NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co\n' +
+      '  NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...\n' +
+      'Encuéntralos en: supabase.com/dashboard → Project Settings → API'
     )
-  }
-  if (!key || key === 'your-anon-key') {
-    throw new Error(
-      '[Super Teacher] Falta NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local\n' +
-      'Encuéntrala en: supabase.com/dashboard → Project Settings → API'
-    )
+    return null
   }
   return { url, key }
 }
 
 export async function createClient() {
-  const { url, key } = getEnvVars()
+  const vars = getEnvVars()
+  if (!vars) return null
+  const { url, key } = vars
   const cookieStore = await cookies()
 
   return createServerClient(
