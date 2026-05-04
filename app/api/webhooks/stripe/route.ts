@@ -99,7 +99,6 @@ export async function POST(request: NextRequest) {
           stripe_customer_id:     customerId,
           stripe_subscription_id: subId,
           current_period_end:     currentPeriodEnd,
-          updated_at:             new Date().toISOString(),
         },
         { onConflict: "user_id" }
       )
