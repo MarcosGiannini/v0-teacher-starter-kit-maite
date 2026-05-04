@@ -91,7 +91,6 @@ export async function GET(request: NextRequest) {
       metadata: { plan },
     })
 
-    console.log(`[Checkout] Sesión creada: ${session.id}`)
     return NextResponse.redirect(session.url!, 303)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)

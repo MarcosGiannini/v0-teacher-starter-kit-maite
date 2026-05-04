@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Sparkles, BookOpen, Users, ArrowRight, Check, ChevronDown } from 'lucide-react'
+import { BookOpen, Feather, Video, ArrowRight, Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -57,9 +57,9 @@ export default async function Page() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {isLoggedIn && hasActiveSub ? (
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all px-8">
+              <Button asChild size="lg" className="bg-[oklch(0.72_0.12_75)] hover:bg-[oklch(0.68_0.14_75)] text-[oklch(0.22_0.025_45)] font-medium shadow-md hover:shadow-lg transition-all px-8 border border-[oklch(0.65_0.12_75)]">
                 <Link href="/dashboard">
-                  Continuar aprendiendo
+                  Acceder a mis Cápsulas
                   <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
                 </Link>
               </Button>
@@ -93,30 +93,29 @@ export default async function Page() {
 
         {/* Sobre mí */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-24">
-          <div className="space-y-5">
-            <p className="text-xs font-medium tracking-[0.2em] uppercase text-primary/70">Tu Super Teacher</p>
+          <div className="space-y-6 order-2 md:order-1">
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-primary/70">Tu profesora</p>
             <h2 className="font-serif text-3xl md:text-4xl font-light text-foreground leading-snug">
-              Conoce a{" "}
-              <span className="italic">Maite Colodrón</span>
+              Mucho más que gramática:{" "}
+              <span className="italic">una inmersión en el español real</span>
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Soy profesora de Español como Lengua Extranjera con más de doce años acompañando a personas
-              de todo el mundo que quieren comunicarse con autenticidad — no solo conjugar verbos.
+              Soy Maite Colodrón. Tras más de 12 años acompañando a estudiantes de todo el mundo,
+              he aprendido que hablar un idioma no es conjugar verbos,{" "}
+              <span className="font-serif italic text-foreground">es habitar una cultura</span>.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              Mi método combina lingüística, cultura e historia para que el idioma cobre vida. Mis alumnos
-              no aprenden español: aprenden a <span className="font-serif italic text-foreground">pensar en español</span>.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Colodrón Bestuer es mi apellido completo — y mi compromiso con una enseñanza rigurosa,
-              cercana y sin estereotipos.
+              Mi método fusiona la rigurosidad lingüística con la historia y la literatura,
+              eliminando los estereotipos para que aprendas a pensar en español.
+              No busco que seas un turista, busco que seas un hablante con{" "}
+              <span className="font-serif italic text-foreground">confianza y propósito</span>.
             </p>
           </div>
 
           {/* Placeholder foto */}
-          <div className="relative mx-auto w-full max-w-xs aspect-[3/4] rounded-3xl bg-secondary/20 border border-secondary/30 overflow-hidden flex items-end justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/8" />
-            <p className="relative z-10 pb-6 text-xs text-muted-foreground/60 tracking-widest uppercase">Foto de Maite</p>
+          <div className="relative order-1 md:order-2 mx-auto w-full max-w-xs aspect-[3/4] rounded-3xl bg-secondary/20 border border-secondary/30 overflow-hidden flex items-end justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/15 via-background/20 to-primary/8" />
+            <p className="relative z-10 pb-6 text-xs text-muted-foreground/50 tracking-widest uppercase">Foto de Maite</p>
           </div>
         </section>
 
@@ -143,9 +142,9 @@ export default async function Page() {
         {/* Plans overview */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           {[
-            { icon: Users,    title: "Cápsulas A1/A2",    desc: "Cápsulas de aprendizaje autónomo con vídeo y PDFs.",                              price: "19€/mes",  plan: "capsulas-a1" },
-            { icon: BookOpen, title: "Cursos Cornelia B1",  desc: "Cursos de cultura, historia y literatura con enfoque conversacional.",          price: "49€/mes",  plan: "cursos-b1-cornelia" },
-            { icon: Sparkles, title: "Mentorship",          desc: "Plan 100% personalizado con sesiones 1-a-1 y seguimiento continuo.",             price: "149€/mes", plan: "mentorship" },
+            { icon: Video,    title: "Cápsulas A1/A2",    desc: "Aprendizaje autónomo. Píldoras de vídeo semanales + material descargable para construir tus cimientos sin prisa pero sin pausa.",                 price: "19€/mes",  plan: "capsulas-a1" },
+            { icon: BookOpen, title: "Cornelia B1+",        desc: "Cultura y Conversación. Un viaje a través de la literatura y la prensa actual para dominar el nivel intermedio mediante el análisis y el debate.", price: "49€/mes",  plan: "cursos-b1-cornelia" },
+            { icon: Feather,  title: "Mentoría 1-a-1",     desc: "Acompañamiento personalizado. Sesiones de 30 min para resolver dudas específicas y acelerar tu fluidez.",                                         price: "149€/mes", plan: "mentorship" },
           ].map(({ icon: Icon, title, desc, price, plan }) => (
             <Link
               key={title}
@@ -222,9 +221,9 @@ export default async function Page() {
             {" "}· Maite Colodrón
           </p>
           <nav className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="/pricing" className="hover:text-primary transition-colors">Planes</Link>
-            <Link href="/login"   className="hover:text-primary transition-colors">Acceder</Link>
-            <Link href="/signup"  className="hover:text-primary transition-colors">Registrarse</Link>
+            <Link href="/pricing"                                                    className="hover:text-primary transition-colors">Planes</Link>
+            <Link href="/login"                                                      className="hover:text-primary transition-colors">Acceder</Link>
+            <Link href="https://wa.me/34600000000" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contacto vía WhatsApp</Link>
           </nav>
         </div>
       </footer>
