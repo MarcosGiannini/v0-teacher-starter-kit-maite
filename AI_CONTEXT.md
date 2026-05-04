@@ -1,7 +1,7 @@
 # AI_CONTEXT — Super Teacher
 
 > Fichero técnico de referencia para asistentes IA que trabajen sobre este proyecto.
-> Actualizado: 2026-05-04
+> Actualizado: 2026-05-04 (Fase 5: engagement schema + notas + CMS scaffold)
 
 ---
 
@@ -201,10 +201,103 @@ TALLY_WEBHOOK_SECRET=...
 | `suppressHydrationWarning` en `<html>` | next-themes modifica la clase antes de hidratación |
 | No `tailwind.config.js` | Tailwind v4 se configura vía postcss + `@theme inline` en CSS |
 | `generateMetadata()` async | Permite metadata dinámica basada en locale |
+| `localStorage` para notas (Fase 5) | PoC sin backend; migrar a tabla `user_notes` en Fase 6 |
+| Tipo canónico `CmsLesson` en cms-config.ts | Abstracción de proveedor: cambiar CMS sin tocar páginas |
 
 ---
 
-## 10. Estado del proyecto (2026-05-04)
+## 10. Schema v2 — Tablas de engagement (supabase/schema_v2.sql)
+
+> ⚠️ **Diseñado, NO ejecutado en producción.** Ejecutar en Supabase SQL Editor cuando se active la funcionalidad.
+
+### Tabla: `lessons`
+Catálogo de lecciones. Puede poblarse manualmente o desde un CMS headless.
+```sql
+CREATE TABLE lessons (
+  id uuid PK, slug text UNIQUE, title text,
+  plan_id text,   -- 'capsulas-a1' | 'cursos-b1-cornelia' | 'mentorship'
+  order_index int, video_url text, duration_s int,
+  is_preview bool DEFAULT false
+)
+```
+
+### Tabla: `user_notes`
+Apuntes privados de cada alumno vinculados a una lección.
+```sql
+CREATE TABLE user_notes (
+  id uuid PK, user_id uuid → auth.users, lesson_id uuid → lessons,
+  content text, created_at/updated_at timestamptz,
+  UNIQUE (user_id, lesson_id)   -- 1 bloque de notas por (alumno, lección)
+)
+```
+- RLS: SELECT/INSERT/UPDATE/DELETE solo sobre filas propias (`auth.uid() = user_id`)
+
+### Tabla: `community_posts`
+Posts del foro privado, visibles solo para suscriptores activos.
+```sql
+CREATE TABLE community_posts (
+  id uuid PK, user_id uuid → auth.users, lesson_id uuid → lessons (nullable),
+  title text, content text, is_pinned bool, is_hidden bool
+)
+```
+- RLS SELECT: `is_hidden = false AND subscriptions.status = 'active'`
+
+### Tabla: `community_replies`
+Respuestas a posts (un nivel de profundidad).
+```sql
+CREATE TABLE community_replies (
+  id uuid PK, post_id uuid → community_posts, user_id uuid → auth.users,
+  content text, is_hidden bool
+)
+```
+
+---
+
+## 11. Arquitectura de contenidos (lib/cms-config.ts)
+
+```typescript
+// Tipo canónico — todos los adaptadores deben devolver este tipo
+interface CmsLesson { id, slug, title, description, planId, orderIndex, videoUrl, durationSeconds, isPreview }
+
+// Proveedor activo
+const CMS_PROVIDER: 'none' | 'contentful' | 'sanity' | 'storyblok' = 'none'
+
+// Funciones de acceso (usar en Server Components)
+getLessonBySlug(slug: string): Promise<CmsLesson | null>
+getLessonsByPlan(planId: string): Promise<CmsLesson[]>
+```
+
+**Migrar a Sanity** (recomendado):
+1. `npm install next-sanity`
+2. Cambiar `CMS_PROVIDER = 'sanity'`
+3. Añadir variables: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `SANITY_API_TOKEN`
+4. Implementar adaptador `getSanityLessonBySlug()`
+
+---
+
+## 12. Notas de alumno — LessonNotes (components/lesson-notes.tsx)
+
+Componente client `'use client'`. Props: `lessonId: string`.
+
+**Estado actual (PoC localStorage)**:
+- `localStorage.getItem/setItem('super-teacher:notes:' + lessonId)`
+- Autosave con debounce de 600 ms tras cada keystroke
+- Indicador visual de hora de guardado (`aria-live="polite"`)
+- Skeleton mientras hidrata para evitar layout shift
+
+**Ruta de lección**: `app/dashboard/leccion/[slug]/page.tsx`
+- Protegida: redirige a `/login` si no autenticado, a `/pricing` si sin suscripción activa
+- Verifica `subscriptions.status = 'active'` antes de renderizar
+- Renderiza `<LessonNotes lessonId={slug} />`
+
+**Migrar a Supabase (Fase 6)**:
+1. Ejecutar `supabase/schema_v2.sql` en Supabase
+2. Reemplazar `localStorage` por `supabase.from('user_notes').upsert({...})`
+3. El `lessonId` pasará de ser el `slug` (string) al `uuid` de la tabla `lessons`
+
+---
+
+## 13. Estado del proyecto (2026-05-04)
 
 ### ✅ Implementado
 - Auth completa (login, signup, logout, dashboard, middleware)
@@ -216,6 +309,10 @@ TALLY_WEBHOOK_SECRET=...
 - Accesibilidad: aria-labels, aria-hidden, sr-only, roles semánticos
 - Responsive: breakpoints sm/md, max-w-screen-md/lg, botones full-width en mobile
 - README.md profesional + AI_CONTEXT.md
+- **Fase 5**: `supabase/schema_v2.sql` (lessons + user_notes + community_posts + community_replies)
+- **Fase 5**: `components/lesson-notes.tsx` (PoC localStorage con autosave + skeleton)
+- **Fase 5**: `app/dashboard/leccion/[slug]/page.tsx` (ruta protegida + placeholder de lección)
+- **Fase 5**: `lib/cms-config.ts` (abstracción CmsLesson + datos estáticos + comentarios Sanity/Contentful)
 
 ### ⏳ Pendiente / Producción
 - Subir foto real de Maite (reemplazar `<div>` placeholder)
@@ -223,5 +320,8 @@ TALLY_WEBHOOK_SECRET=...
 - Reemplazar `STRIPE_WEBHOOK_SECRET` con signing secret real
 - Crear endpoint webhook en Stripe Dashboard (producción)
 - SQL: `ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_user_id_key UNIQUE (user_id);`
+- Ejecutar `supabase/schema_v2.sql` en Supabase SQL Editor (cuando se active la funcionalidad)
+- Migrar `LessonNotes` de localStorage a tabla `user_notes` (Fase 6)
+- Poblar tabla `lessons` o conectar CMS real (Sanity recomendado)
 - Implementar integración Tally.so
-- Área de contenidos en `/dashboard` (vídeos, PDFs)
+- Página de listado de lecciones por plan en `/dashboard`
