@@ -41,8 +41,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Webhook signature error: ${message}` }, { status: 400 })
   }
 
-  console.log(`[Webhook] Evento: ${event.type}`)
-
   // --- 4. Procesar checkout.session.completed ---
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session
@@ -53,15 +51,11 @@ export async function POST(request: NextRequest) {
     const customerId = typeof session.customer === "string" ? session.customer : null
     const subId      = typeof session.subscription === "string" ? session.subscription : null
 
-    console.log(`[Webhook] Sesión completada — user=${userId}, plan=${plan}`)
-
     if (!userId) {
       console.error("[Webhook] ❌ No hay client_reference_id en la sesión. Imposible actualizar suscripción.")
       // Devolvemos 200 para que Stripe no reintente — es un error de configuración nuestro
       return NextResponse.json({ warning: "Missing client_reference_id" })
     }
-
-    console.log(`[Webhook] Buscando usuario en Supabase: ${userId}`)
 
     // --- 5. Cliente Supabase con service role (bypasa RLS) ---
     const supabaseUrl      = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -108,7 +102,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: dbError.message }, { status: 500 })
     }
 
-    console.log(`[Webhook] Pago procesado para: ${email ?? userId}`)
   }
 
   return NextResponse.json({ received: true })

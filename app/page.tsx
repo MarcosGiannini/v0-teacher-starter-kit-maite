@@ -59,7 +59,7 @@ export default async function Page() {
             {isLoggedIn && hasActiveSub ? (
               <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all px-8">
                 <Link href="/dashboard">
-                  Ir a mi Dashboard
+                  Continuar aprendiendo
                   <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
                 </Link>
               </Button>
@@ -91,6 +91,35 @@ export default async function Page() {
           </div>
         </header>
 
+        {/* Sobre mí */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-24">
+          <div className="space-y-5">
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-primary/70">Tu Super Teacher</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-light text-foreground leading-snug">
+              Conoce a{" "}
+              <span className="italic">Maite Colodrón</span>
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Soy profesora de Español como Lengua Extranjera con más de doce años acompañando a personas
+              de todo el mundo que quieren comunicarse con autenticidad — no solo conjugar verbos.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              Mi método combina lingüística, cultura e historia para que el idioma cobre vida. Mis alumnos
+              no aprenden español: aprenden a <span className="font-serif italic text-foreground">pensar en español</span>.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              Colodrón Bestuer es mi apellido completo — y mi compromiso con una enseñanza rigurosa,
+              cercana y sin estereotipos.
+            </p>
+          </div>
+
+          {/* Placeholder foto */}
+          <div className="relative mx-auto w-full max-w-xs aspect-[3/4] rounded-3xl bg-secondary/20 border border-secondary/30 overflow-hidden flex items-end justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/8" />
+            <p className="relative z-10 pb-6 text-xs text-muted-foreground/60 tracking-widest uppercase">Foto de Maite</p>
+          </div>
+        </section>
+
         {/* Feature pills */}
         <section className="flex flex-wrap justify-center gap-3 mb-20">
           {[
@@ -114,9 +143,9 @@ export default async function Page() {
         {/* Plans overview */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           {[
-            { icon: Users,    title: "Cápsulas A1",       desc: "Vídeos breves + PDFs para empezar desde cero.",           price: "19€/mes", plan: "capsulas-a1" },
-            { icon: BookOpen, title: "Cursos B1 Cornelia", desc: "Nivel intermedio con la novela Cornelia.",                price: "49€/mes", plan: "cursos-b1-cornelia" },
-            { icon: Sparkles, title: "Mentorship",         desc: "Atención individualizada y plan 100% personalizado.",     price: "149€/mes", plan: "mentorship" },
+            { icon: Users,    title: "Cápsulas A1/A2",    desc: "Cápsulas de aprendizaje autónomo con vídeo y PDFs.",                              price: "19€/mes",  plan: "capsulas-a1" },
+            { icon: BookOpen, title: "Cursos Cornelia B1",  desc: "Cursos de cultura, historia y literatura con enfoque conversacional.",          price: "49€/mes",  plan: "cursos-b1-cornelia" },
+            { icon: Sparkles, title: "Mentorship",          desc: "Plan 100% personalizado con sesiones 1-a-1 y seguimiento continuo.",             price: "149€/mes", plan: "mentorship" },
           ].map(({ icon: Icon, title, desc, price, plan }) => (
             <Link
               key={title}
