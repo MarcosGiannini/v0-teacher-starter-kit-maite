@@ -100,7 +100,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(session.url!, 303)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error("[Checkout] ❌ Error de Stripe:", message)
+    // Detalles extendidos de error de Stripe para diagnóstico
+    const stripeErr = err as Record<string, unknown>
+    console.error("[Checkout] ❌ Error de Stripe:", {
+      message,
+      type:    stripeErr?.type,
+      code:    stripeErr?.code,
+      // 'api_key_invalid' → la clave es incorrecta/revocada
+      // 'parameter_missing' / 'resource_missing' → Price ID mal configurado
+    })
     return NextResponse.json(
       { error: `Error al crear la sesión de pago: ${message}` },
       { status: 500 }
