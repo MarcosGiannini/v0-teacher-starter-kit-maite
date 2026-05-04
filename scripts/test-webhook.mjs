@@ -74,8 +74,11 @@ const event = {
 const body = JSON.stringify(event)
 
 // --- Firmar el payload (igual que hace Stripe) ---
+// El SDK de Stripe decodifica la parte base64 del secreto antes de usarla como clave HMAC.
+// Si usamos la cadena base64 directamente la firma nunca coincidirá.
+const secretBytes = Buffer.from(webhookSecret.replace("whsec_", ""), "base64")
 const signedPayload = `${timestamp}.${body}`
-const hmac = createHmac("sha256", webhookSecret.replace("whsec_", ""))
+const hmac = createHmac("sha256", secretBytes)
   .update(signedPayload)
   .digest("hex")
 const stripeSignature = `t=${timestamp},v1=${hmac}`

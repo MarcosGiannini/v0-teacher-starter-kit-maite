@@ -14,8 +14,11 @@ export async function POST(request: NextRequest) {
   const sig = request.headers.get("stripe-signature")
 
   // --- 2. Validar variables de entorno ---
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim()
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim()
+
+  // Log para verificar visualmente que el servidor usa la clave correcta
+  console.log("[Webhook] 🔑 Usando secreto que empieza por:", webhookSecret?.slice(0, 10))
 
   if (!webhookSecret) {
     console.error("[Webhook] ❌ STRIPE_WEBHOOK_SECRET no está configurado en .env.local")
