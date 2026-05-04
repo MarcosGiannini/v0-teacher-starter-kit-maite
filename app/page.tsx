@@ -41,7 +41,7 @@ export default async function Page() {
         {/* Hero */}
         <header className="text-center mb-20">
           <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-secondary/15 text-foreground/80 mb-10 border border-secondary/25">
-            <Sparkles className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} />
+            <Feather className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} />
             <span className="text-sm tracking-wide">Aprende español con propósito</span>
           </div>
 
@@ -59,7 +59,7 @@ export default async function Page() {
             {isLoggedIn && hasActiveSub ? (
               <Button asChild size="lg" className="bg-[oklch(0.72_0.12_75)] hover:bg-[oklch(0.68_0.14_75)] text-[oklch(0.22_0.025_45)] font-medium shadow-md hover:shadow-lg transition-all px-8 border border-[oklch(0.65_0.12_75)]">
                 <Link href="/dashboard">
-                  Acceder a mis Cápsulas
+                  Ir a mis materiales
                   <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
                 </Link>
               </Button>
@@ -67,7 +67,7 @@ export default async function Page() {
               <>
                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all px-8">
                   <Link href="/pricing">
-                    Ver planes
+                    Empezar ahora
                     <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
                   </Link>
                 </Button>
@@ -79,7 +79,7 @@ export default async function Page() {
               <>
                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all px-8">
                   <Link href="/signup">
-                    Empezar gratis
+                    Empezar ahora
                     <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
                   </Link>
                 </Button>
