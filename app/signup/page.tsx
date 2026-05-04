@@ -19,7 +19,7 @@ export default async function SignupPage({
         {/* Header */}
         <div className="text-center space-y-1">
           <h1 className="font-serif text-4xl font-light tracking-wide text-foreground">
-            Super Teacher
+            <Link href="/" className="hover:text-primary transition-colors">Super Teacher</Link>
           </h1>
           <p className="text-sm text-muted-foreground">
             Comienza tu viaje con el español

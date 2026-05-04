@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import { Check, BookOpen, Users } from "lucide-react"
 import { Feather } from "lucide-react"
 import Link from "next/link"
-
 const plans = [
   {
     id: "capsulas-a1",
@@ -99,7 +98,7 @@ export default function PricingPage() {
         </header>
 
         {/* Pricing cards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan) => {
             const Icon = plan.icon
             const isFeatured = plan.variant === "featured"
@@ -195,7 +194,7 @@ export default function PricingPage() {
                     ].join(" ")}
                     variant={isFeatured ? "default" : "outline"}
                   >
-                    <Link href={plan.ctaHref}>
+                    <Link href={plan.ctaHref} aria-label={`${plan.cta} — Plan ${plan.title}`}>
                       {plan.cta}
                     </Link>
                   </Button>

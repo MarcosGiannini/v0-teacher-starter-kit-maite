@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { logout } from '@/app/auth/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -43,7 +44,7 @@ export default async function DashboardPage() {
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <h1 className="font-serif text-4xl font-light tracking-wide text-foreground">
-              Super Teacher
+              <Link href="/" className="hover:text-primary transition-colors">Super Teacher</Link>
             </h1>
             <p className="text-muted-foreground">
               Tu plataforma de membresía
