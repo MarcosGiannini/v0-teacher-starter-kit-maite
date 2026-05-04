@@ -3,82 +3,21 @@ import { Button } from '@/components/ui/button'
 import { BookOpen, Feather, Video, ArrowRight, Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTENT — cambia aquí los textos para traducir la página a otro idioma
-// ─────────────────────────────────────────────────────────────────────────────
-const CONTENT = {
-  meta: {
-    title: 'Aprende español con confianza',
-    description:
-      'Plataforma de membresía para aprender español online con Maite Colodrón. Vídeos, cursos y mentoría personalizada. Niveles A1–C1, preparación DELE/SIELE.',
-  },
-  hero: {
-    badge: 'Aprende español con propósito',
-    heading: ['Habla español con', 'confianza'],
-    subheading: 'Clases y recursos de',
-    subheadingName: 'Maite Colodrón',
-    subheadingEnd: 'adaptados a tu nivel y ritmo de vida',
-    ctaActive: 'Ir a mis materiales',
-    ctaStart: 'Empezar ahora',
-    ctaAccount: 'Mi cuenta',
-    ctaLogin: 'Ya tengo cuenta',
-    ctaPlans: 'Ver planes',
-  },
-  about: {
-    label: 'Tu profesora',
-    heading: 'Mucho más que gramática:',
-    headingItalic: 'una inmersión en el español real',
-    p1start: 'Soy Maite Colodrón. Tras más de 12 años acompañando a estudiantes de todo el mundo, he aprendido que hablar un idioma no es conjugar verbos,',
-    p1italic: 'es habitar una cultura',
-    p2: 'Mi método fusiona la rigurosidad lingüística con la historia y la literatura, eliminando los estereotipos para que aprendas a pensar en español. No busco que seas un turista, busco que seas un hablante con',
-    p2italic: 'confianza y propósito',
-    photoAlt: 'Foto de Maite Colodrón, profesora de español',
-    photoPlaceholder: 'Foto de Maite',
-  },
-  pills: [
-    'Niveles A1 a C1',
-    'Clases en vídeo',
-    'Material descargable',
-    'Comunidad privada',
-    'Certificaciones DELE/SIELE',
-    'Mentoría 1-a-1',
-  ],
-  plans: [
-    { title: 'Cápsulas A1/A2', desc: 'Cimientos sólidos. Píldoras de vídeo y material descargable para avanzar a tu ritmo.',               price: '19€/mes' },
-    { title: 'Cornelia B1+',   desc: 'Inmersión cultural. Domina el español intermedio a través de la literatura y la actualidad.',        price: '49€/mes' },
-    { title: 'Mentoría 1-a-1', desc: 'Fluidez total. Sesiones personalizadas para resolver dudas y acelerar tus resultados.',              price: '149€/mes' },
-  ],
-  cta: 'Ver todos los planes →',
-  faq: {
-    heading: 'Preguntas frecuentes',
-    items: [
-      { q: '¿Necesito conocimientos previos de español?',        a: 'No. Las Cápsulas A1 están diseñadas para empezar desde cero. Si ya tienes base, los Cursos B1 o Mentoría se adaptan a tu nivel.' },
-      { q: '¿Puedo cancelar mi membresía en cualquier momento?', a: 'Sí, sin permanencia ni penalizaciones. Cancelas desde tu área de cliente y mantienes el acceso hasta el fin del período pagado.' },
-      { q: '¿Qué diferencia hay entre los cursos y la mentoría?',a: 'Los cursos son contenido estructurado que sigues a tu ritmo. La Mentoría añade sesiones 1-a-1 con Maite, feedback personalizado y un plan diseñado para tus objetivos concretos.' },
-      { q: '¿Los materiales están disponibles tras cancelar?',    a: 'Durante tu membresía activa tienes acceso completo. Al cancelar, el acceso se cierra al finalizar el ciclo de facturación.' },
-      { q: '¿Se puede preparar el DELE con estos cursos?',       a: 'Sí. El contenido incluye práctica de las competencias que evalúa el DELE (comprensión, expresión oral y escrita). La Mentoría permite un plan de preparación específico al examen.' },
-    ],
-  },
-  footer: {
-    copy: '© 2026',
-    brand: 'Super Teacher',
-    author: '· Maite Colodrón',
-    navPlans: 'Planes',
-    navLogin: 'Acceder',
-    navWhatsApp: 'Contacto vía WhatsApp',
-  },
-}
-
-export const metadata: Metadata = {
-  title: CONTENT.meta.title,
-  description: CONTENT.meta.description,
-}
+import { getLocale } from '@/lib/i18n/get-locale'
+import { translations } from '@/lib/i18n/translations'
 
 const PLAN_ICONS = [Video, BookOpen, Feather]
 
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const { meta } = translations[locale].home
+  return { title: meta.title, description: meta.description }
+}
+
 export default async function Page() {
-  const supabase = await createClient()
+  const [locale, supabase] = await Promise.all([getLocale(), createClient()])
+  const CONTENT = translations[locale].home
+
   let isLoggedIn = false
   let hasActiveSub = false
 

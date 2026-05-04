@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ThemeProvider } from '@/components/theme-provider'
+import { SiteControls } from '@/components/site-controls'
+import { getLocale } from '@/lib/i18n/get-locale'
+import { translations } from '@/lib/i18n/translations'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({ 
@@ -61,16 +65,22 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
+  const labels = translations[locale].controls
+
   return (
-    <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang={locale} className={`${cormorant.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        {children}
-        <Analytics />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <SiteControls locale={locale} labels={labels} />
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )

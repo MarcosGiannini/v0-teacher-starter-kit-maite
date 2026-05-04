@@ -2,97 +2,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Check, BookOpen, Users, Feather } from "lucide-react"
 import Link from "next/link"
+import { getLocale } from "@/lib/i18n/get-locale"
+import { translations } from "@/lib/i18n/translations"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTENT — cambia aquí los textos para traducir la página a otro idioma
-// ─────────────────────────────────────────────────────────────────────────────
-const CONTENT = {
-  header: {
-    badge: 'Elige tu camino',
-    heading: ['Planes y', 'precios'],
-    subheading: 'Aprende español con',
-    subheadingName: 'Maite Colodrón',
-    subheadingEnd: 'al ritmo que necesitas',
-  },
-  guarantee: 'Todos los planes incluyen',
-  guaranteeHighlight: '7 días de prueba gratuita',
-  guaranteeEnd: '. Sin permanencia, cancela cuando quieras.',
-  footer: {
-    back: '← Volver al portal',
-    credit: 'Desarrollado con',
-    creditBy: 'por Marcos',
-  },
-}
-
-const plans = [
-  {
-    id: "capsulas-a1",
-    icon: Users,
-    label: "Acceso inicial",
-    title: "Cápsulas A1/A2",
-    subtitle: "Membresía A1/A2",
-    price: "19",
-    period: "/mes",
-    description: "Cimientos sólidos. Píldoras de vídeo y material descargable para avanzar a tu ritmo.",
-    features: [
-      "Cápsulas de vídeo (5–10 min) semanales",
-      "PDFs de vocabulario y gramática A1/A2",
-      "Ejercicios de pronunciación",
-      "Acceso a la comunidad privada",
-      "Actualizaciones mensuales de contenido",
-    ],
-    cta: "Empezar ahora",
-    ctaHref: "/api/checkout?plan=capsulas-a1",
-    variant: "default" as const,
-    highlight: false,
-  },
-  {
-    id: "cursos-b1-cornelia",
-    icon: BookOpen,
-    label: "Más popular",
-    title: "Cornelia B1+",
-    subtitle: "Español intermedio",
-    price: "49",
-    period: "/mes",
-    description: "Inmersión cultural. Domina el español intermedio a través de la literatura y la actualidad.",
-    features: [
-      "Todo lo incluido en Cápsulas A1",
-      "Curso completo basado en Cornelia",
-      "Lecturas de actualidad con análisis",
-      "Sesiones de conversación en grupo (2×/mes)",
-      "Corrección de textos escritos",
-      "Material de examen DELE/SIELE B1",
-    ],
-    cta: "Quiero este plan",
-    ctaHref: "/api/checkout?plan=cursos-b1-cornelia",
-    variant: "featured" as const,
-    highlight: true,
-  },
-  {
-    id: "mentorship",
-    icon: Feather,
-    label: "Experiencia premium",
-    title: "Mentoría 1-a-1",
-    subtitle: "Acompañamiento personalizado",
-    price: "149",
-    period: "/mes",
-    description: "Fluidez total. Sesiones personalizadas para resolver dudas y acelerar tus resultados.",
-    features: [
-      "Todo lo incluido en Cursos B1 Cornelia",
-      "Sesiones 1-a-1 con Maite (4×/mes)",
-      "Plan de estudio 100% personalizado",
-      "Revisión detallada de tareas y escritura",
-      "Soporte directo por WhatsApp",
-      "Preparación intensiva para certificados oficiales",
-    ],
-    cta: "Solicitar plaza",
-    ctaHref: "/api/checkout?plan=mentorship",
-    variant: "outline" as const,
-    highlight: false,
-  },
+// Static plan data (prices, routes, icons — never translated)
+const PLANS_STATIC = [
+  { id: "capsulas-a1",        icon: Users,    price: "19",  ctaHref: "/api/checkout?plan=capsulas-a1",        variant: "default"  as const },
+  { id: "cursos-b1-cornelia", icon: BookOpen, price: "49",  ctaHref: "/api/checkout?plan=cursos-b1-cornelia", variant: "featured" as const },
+  { id: "mentorship",         icon: Feather,  price: "149", ctaHref: "/api/checkout?plan=mentorship",         variant: "outline"  as const },
 ]
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const locale = await getLocale()
+  const t = translations[locale].pricing
+  const plans = PLANS_STATIC.map((s, i) => ({ ...s, ...t.plans[i] }))
+
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Decorative blobs */}
@@ -104,23 +28,23 @@ export default function PricingPage() {
         <header className="text-center mb-14 sm:mb-20">
           <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-secondary/15 text-foreground/80 mb-8 sm:mb-10 border border-secondary/25">
             <Feather className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} aria-hidden="true" />
-            <span className="text-sm tracking-wide">{CONTENT.header.badge}</span>
+            <span className="text-sm tracking-wide">{t.header.badge}</span>
           </div>
 
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-light text-foreground mb-6 tracking-tight text-balance leading-tight">
-            {CONTENT.header.heading[0]}{" "}
-            <span className="font-medium italic">{CONTENT.header.heading[1]}</span>
+            {t.header.heading[0]}{" "}
+            <span className="font-medium italic">{t.header.heading[1]}</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light tracking-wide max-w-2xl mx-auto text-pretty">
-            {CONTENT.header.subheading}{" "}
-            <span className="font-serif italic text-foreground">{CONTENT.header.subheadingName}</span>{" "}
-            {CONTENT.header.subheadingEnd}
+            {t.header.subheading}{" "}
+            <span className="font-serif italic text-foreground">{t.header.subheadingName}</span>{" "}
+            {t.header.subheadingEnd}
           </p>
         </header>
 
         {/* Pricing cards */}
         <section aria-labelledby="pricing-heading" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 md:gap-8 items-stretch">
-          <h2 id="pricing-heading" className="sr-only">Planes de membresía</h2>
+          <h2 id="pricing-heading" className="sr-only">{locale === 'es' ? 'Planes de membresía' : 'Membership plans'}</h2>
           {plans.map((plan) => {
             const Icon = plan.icon
             const isFeatured = plan.variant === "featured"
@@ -180,7 +104,7 @@ export default function PricingPage() {
                     <span className="font-serif text-4xl sm:text-5xl font-light text-foreground">
                       {plan.price}€
                     </span>
-                    <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
+                    <span className="text-muted-foreground text-sm ml-1">{t.period}</span>
                   </div>
                 </CardHeader>
 
@@ -190,7 +114,7 @@ export default function PricingPage() {
                   </p>
 
                   {/* Features */}
-                  <ul className="space-y-2 sm:space-y-2.5 flex-1" aria-label={`Características del plan ${plan.title}`}>
+                  <ul className="space-y-2 sm:space-y-2.5 flex-1" aria-label={`${locale === 'es' ? 'Características del plan' : 'Features of'} ${plan.title}`}>
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2.5">
                         <Check
@@ -214,7 +138,7 @@ export default function PricingPage() {
                     ].join(" ")}
                     variant={isFeatured ? "default" : "outline"}
                   >
-                    <Link href={plan.ctaHref} aria-label={`${plan.cta} — Plan ${plan.title}`}>
+                    <Link href={plan.ctaHref} aria-label={`${plan.cta} — ${plan.title}`}>
                       {plan.cta}
                     </Link>
                   </Button>
@@ -226,9 +150,9 @@ export default function PricingPage() {
 
         {/* Guarantee note */}
         <p className="text-center text-sm text-muted-foreground mt-10 sm:mt-14 tracking-wide">
-          {CONTENT.guarantee}{" "}
-          <span className="text-foreground font-medium">{CONTENT.guaranteeHighlight}</span>
-          {CONTENT.guaranteeEnd}
+          {t.guarantee}{" "}
+          <span className="text-foreground font-medium">{t.guaranteeHighlight}</span>
+          {t.guaranteeEnd}
         </p>
       </main>
 
@@ -236,10 +160,10 @@ export default function PricingPage() {
       <footer className="relative py-8 sm:py-12 mt-12 sm:mt-20 border-t border-border/20">
         <nav aria-label="Footer pricing" className="text-center text-sm text-muted-foreground tracking-wide">
           <Link href="/" className="hover:text-primary transition-colors">
-            {CONTENT.footer.back}
+            {t.footer.back}
           </Link>
           <span className="mx-4 text-border" aria-hidden="true">|</span>
-          {CONTENT.footer.credit} <span className="text-primary" aria-hidden="true">&#10084;</span> {CONTENT.footer.creditBy}
+          {t.footer.credit} <span className="text-primary" aria-hidden="true">&#10084;</span> {t.footer.creditBy}
         </nav>
       </footer>
     </div>
