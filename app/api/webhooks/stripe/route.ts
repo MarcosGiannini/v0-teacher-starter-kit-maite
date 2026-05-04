@@ -61,6 +61,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ warning: "Missing client_reference_id" })
     }
 
+    console.log(`[Webhook] 🔎 Buscando usuario en Supabase con ID: ${userId}`)
+
     // --- 5. Cliente Supabase con service role (bypasa RLS) ---
     const supabaseUrl      = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceRoleKey   = process.env.SUPABASE_SERVICE_ROLE_KEY
