@@ -17,19 +17,16 @@ export async function POST(request: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim()
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim()
 
-  // Log para verificar visualmente que el servidor usa la clave correcta
-  console.log("[Webhook] 🔑 Usando secreto que empieza por:", webhookSecret?.slice(0, 10))
-
   if (!webhookSecret) {
-    console.error("[Webhook] ❌ STRIPE_WEBHOOK_SECRET no está configurado en .env.local")
+    console.error("[Webhook] STRIPE_WEBHOOK_SECRET no está configurado")
     return NextResponse.json({ error: "Webhook secret no configurado" }, { status: 503 })
   }
   if (!secretKey) {
-    console.error("[Webhook] ❌ STRIPE_SECRET_KEY no está configurado en .env.local")
+    console.error("[Webhook] STRIPE_SECRET_KEY no está configurado")
     return NextResponse.json({ error: "Stripe no configurado" }, { status: 503 })
   }
   if (!sig) {
-    console.error("[Webhook] ❌ Falta la cabecera stripe-signature")
+    console.error("[Webhook] Falta la cabecera stripe-signature")
     return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 })
   }
 
@@ -40,11 +37,11 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error("[Webhook] ❌ Firma inválida:", message)
+    console.error("[Webhook] Firma inválida:", message)
     return NextResponse.json({ error: `Webhook signature error: ${message}` }, { status: 400 })
   }
 
-  console.log(`[Webhook] 🔔 Evento recibido: ${event.type}`)
+  console.log(`[Webhook] Evento: ${event.type}`)
 
   // --- 4. Procesar checkout.session.completed ---
   if (event.type === "checkout.session.completed") {
@@ -56,7 +53,7 @@ export async function POST(request: NextRequest) {
     const customerId = typeof session.customer === "string" ? session.customer : null
     const subId      = typeof session.subscription === "string" ? session.subscription : null
 
-    console.log(`[Webhook] 📦 Sesión completada — user=${userId}, plan=${plan}, customer=${customerId}`)
+    console.log(`[Webhook] Sesión completada — user=${userId}, plan=${plan}`)
 
     if (!userId) {
       console.error("[Webhook] ❌ No hay client_reference_id en la sesión. Imposible actualizar suscripción.")
@@ -64,14 +61,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ warning: "Missing client_reference_id" })
     }
 
-    console.log(`[Webhook] 🔎 Buscando usuario en Supabase con ID: ${userId}`)
+    console.log(`[Webhook] Buscando usuario en Supabase: ${userId}`)
 
     // --- 5. Cliente Supabase con service role (bypasa RLS) ---
     const supabaseUrl      = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceRoleKey   = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !serviceRoleKey) {
-      console.error("[Webhook] ❌ SUPABASE_SERVICE_ROLE_KEY no está configurado en .env.local")
+      console.error("[Webhook] SUPABASE_SERVICE_ROLE_KEY no está configurado")
       return NextResponse.json({ error: "Supabase admin no configurado" }, { status: 503 })
     }
 
@@ -108,11 +105,11 @@ export async function POST(request: NextRequest) {
       )
 
     if (dbError) {
-      console.error("[Webhook] ❌ Error guardando suscripción en Supabase:", dbError.message)
+      console.error("[Webhook] Error guardando suscripción:", dbError.message)
       return NextResponse.json({ error: dbError.message }, { status: 500 })
     }
 
-    console.log(`[Webhook] ✅ Pago procesado para: ${email ?? userId}`)
+    console.log(`[Webhook] Pago procesado para: ${email ?? userId}`)
   }
 
   return NextResponse.json({ received: true })

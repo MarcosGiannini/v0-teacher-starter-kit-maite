@@ -15,9 +15,30 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Portal de Bienvenida - Maite Colodrón | Super Teacher',
-  description: 'Centro de creación de tu plataforma Super Teacher',
-  generator: 'v0.app',
+  title: {
+    default: 'Super Teacher · Aprende español con Maite Colodrón',
+    template: '%s · Super Teacher',
+  },
+  description:
+    'Plataforma de membresía para aprender español. Vídeos, PDFs, cursos y mentoría personalizada con Maite Colodrón. Niveles A1 a C1, certificaciones DELE/SIELE.',
+  keywords: ['aprender español', 'clases de español online', 'Maite Colodrón', 'DELE', 'SIELE', 'español para extranjeros'],
+  authors: [{ name: 'Maite Colodrón' }],
+  openGraph: {
+    title: 'Super Teacher · Aprende español con Maite Colodrón',
+    description: 'Plataforma de membresía para aprender español online con vídeos, cursos y mentoría.',
+    type: 'website',
+    locale: 'es_ES',
+    siteName: 'Super Teacher',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Super Teacher · Aprende español con Maite Colodrón',
+    description: 'Aprende español online con Maite Colodrón. Niveles A1–C1, DELE/SIELE.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: [
       {

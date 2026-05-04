@@ -39,30 +39,24 @@ export async function GET(request: NextRequest) {
   }
 
   // --- 3. Validar y sanear clave de Stripe ---
-  console.log("DEBUG: La clave empieza por:", process.env.STRIPE_SECRET_KEY?.trim().substring(0, 7))
-  console.log("DEBUG: La clave termina en:", process.env.STRIPE_SECRET_KEY?.trim().slice(-4))
-
   const rawKey = process.env.STRIPE_SECRET_KEY
   if (!rawKey || rawKey.trim() === "") {
-    console.error("ERROR: La variable STRIPE_SECRET_KEY está vacía o es undefined")
+    console.error("[Checkout] STRIPE_SECRET_KEY no está configurado")
     return NextResponse.json(
       { error: "Stripe no está configurado. Contacta con el administrador." },
       { status: 503 }
     )
   }
 
-  // .trim() elimina espacios, tabulaciones y saltos de línea invisibles
   const secretKey = rawKey.trim()
 
   if (!secretKey.startsWith("sk_test_") && !secretKey.startsWith("sk_live_")) {
-    console.error("ERROR: STRIPE_SECRET_KEY no tiene el formato esperado (sk_test_... o sk_live_...). Valor actual empieza por:", secretKey.substring(0, 10))
+    console.error("[Checkout] STRIPE_SECRET_KEY tiene formato inválido")
     return NextResponse.json(
       { error: "La clave de Stripe tiene un formato inválido." },
       { status: 503 }
     )
   }
-
-  console.log("[Checkout] 🔑 Longitud de la clave (sin espacios):", secretKey.length, "| Prefijo:", secretKey.slice(0, 12))
 
   // --- 4. Obtener email e ID del usuario logueado en Supabase ---
   const supabase = await createClient()
@@ -74,7 +68,6 @@ export async function GET(request: NextRequest) {
     if (userError) {
       console.error("[Checkout] ⚠️  Error obteniendo usuario de Supabase:", userError.message)
     } else {
-      console.log(`[Checkout] ✅ Usuario identificado: ${user?.email ?? "anónimo"}`)
       customerEmail = user?.email ?? undefined
       userId = user?.id ?? undefined
     }
@@ -87,8 +80,6 @@ export async function GET(request: NextRequest) {
     // Usamos secretKey (ya sanitizado con .trim()) — nunca releer process.env aquí
     const stripe = new Stripe(secretKey)
 
-    console.log(`[Checkout] 🔄 Creando sesión para plan="${plan}", price="${priceId}", email="${customerEmail ?? "none"}"`)
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -100,19 +91,12 @@ export async function GET(request: NextRequest) {
       metadata: { plan },
     })
 
-    console.log(`[Checkout] ✅ Sesión creada: ${session.id}`)
+    console.log(`[Checkout] Sesión creada: ${session.id}`)
     return NextResponse.redirect(session.url!, 303)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    // Detalles extendidos de error de Stripe para diagnóstico
     const stripeErr = err as Record<string, unknown>
-    console.error("[Checkout] ❌ Error de Stripe:", {
-      message,
-      type:    stripeErr?.type,
-      code:    stripeErr?.code,
-      // 'api_key_invalid' → la clave es incorrecta/revocada
-      // 'parameter_missing' / 'resource_missing' → Price ID mal configurado
-    })
+    console.error("[Checkout] Error de Stripe:", { message, type: stripeErr?.type, code: stripeErr?.code })
     return NextResponse.json(
       { error: `Error al crear la sesión de pago: ${message}` },
       { status: 500 }
