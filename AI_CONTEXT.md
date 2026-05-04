@@ -1,7 +1,7 @@
 # AI_CONTEXT — Super Teacher
 
 > Fichero técnico de referencia para asistentes IA que trabajen sobre este proyecto.
-> Actualizado: 2026-05-04 (Fase 5: engagement schema + notas + CMS scaffold)
+> Actualizado: 2026-05-04 (Fase 4.5: refactor estético + Fase 5.1: admin portal)
 
 ---
 
@@ -115,9 +115,19 @@ Crea una Stripe Checkout Session con:
 ## 5. Rutas protegidas (middleware.ts)
 
 ```
-/dashboard  → requiere auth activa → redirect /login si no autenticado
-/login      → redirect /dashboard si ya autenticado
-/signup     → redirect /dashboard si ya autenticado
+/dashboard            → requiere auth activa → redirect /login si no autenticado
+/dashboard/admin/**   → requiere auth + app_metadata.role === 'admin' → redirect /dashboard si no admin
+/login                → redirect /dashboard si ya autenticado
+/signup               → redirect /dashboard si ya autenticado
+```
+
+### Cómo asignar el rol admin en Supabase
+El rol se guarda en `app_metadata` (solo escribible por service_role — no editable por el usuario).
+Ejecutar desde Supabase SQL Editor:
+```sql
+UPDATE auth.users
+SET raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}'::jsonb
+WHERE email = 'maite@superteacher.es';
 ```
 
 ### Comportamiento Edge Runtime
@@ -203,6 +213,46 @@ TALLY_WEBHOOK_SECRET=...
 | `generateMetadata()` async | Permite metadata dinámica basada en locale |
 | `localStorage` para notas (Fase 5) | PoC sin backend; migrar a tabla `user_notes` en Fase 6 |
 | Tipo canónico `CmsLesson` en cms-config.ts | Abstracción de proveedor: cambiar CMS sin tocar páginas |
+| `app_metadata.role` para admin | Solo escribible vía service_role; no editable por el usuario |
+| `useActionState` en formulario admin | Feedback inmediato sin recarga; compatible con React 19 |
+
+---
+
+## 10. Portal de administración — Admin Contribution Hub
+
+### Ruta
+```
+GET /dashboard/admin/upload
+```
+**Componente**: `app/dashboard/admin/upload/page.tsx` (`'use client'`)
+
+### Acceso
+El middleware verifica `user.app_metadata.role === 'admin'` antes de llegar a la página.
+Si el rol no coincide → redirect a `/dashboard`.
+
+### Formulario — Campos
+
+| Campo | Tipo | Obligatorio | Validación |
+|-------|------|-------------|------------|
+| `title` | text | ✅ | max 200 chars |
+| `slug` | text | ✅ | `^[a-z0-9]+(?:-[a-z0-9]+)*$`, max 120 |
+| `plan_id` | select | ✅ | `capsulas-a1` \| `cursos-b1-cornelia` \| `mentorship` |
+| `order_index` | number | — | ≥ 1, default 1 |
+| `video_url` | url | — | `^https?://` |
+| `duration_s` | number | — | segundos, ≥ 0 |
+| `description` | textarea | — | texto libre |
+| `is_preview` | checkbox | — | si marcado, lección gratuita |
+
+### Server Action
+```
+app/actions/create-lesson.ts
+```
+- Verifica de nuevo auth + role (defensa en profundidad)
+- Validación de campos + errores granulares por campo
+- `supabase.from('lessons').insert({...})`
+- Error code `23505` → slug duplicado → mensaje específico
+- `revalidatePath('/dashboard')` al guardar correctamente
+- Usa `useActionState(createLesson, initialState)` en cliente para feedback sin recarga
 
 ---
 
@@ -313,6 +363,8 @@ Componente client `'use client'`. Props: `lessonId: string`.
 - **Fase 5**: `components/lesson-notes.tsx` (PoC localStorage con autosave + skeleton)
 - **Fase 5**: `app/dashboard/leccion/[slug]/page.tsx` (ruta protegida + placeholder de lección)
 - **Fase 5**: `lib/cms-config.ts` (abstracción CmsLesson + datos estáticos + comentarios Sanity/Contentful)
+- **Fase 4.5**: Refactor estético — `max-w-6xl`, sección Hero con más aire, grid Profesora 60/40
+- **Fase 5.1**: Middleware admin (`app_metadata.role`), `/dashboard/admin/upload`, `app/actions/create-lesson.ts`
 
 ### ⏳ Pendiente / Producción
 - Subir foto real de Maite (reemplazar `<div>` placeholder)
@@ -321,6 +373,7 @@ Componente client `'use client'`. Props: `lessonId: string`.
 - Crear endpoint webhook en Stripe Dashboard (producción)
 - SQL: `ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_user_id_key UNIQUE (user_id);`
 - Ejecutar `supabase/schema_v2.sql` en Supabase SQL Editor (cuando se active la funcionalidad)
+- Asignar `app_metadata.role = 'admin'` a Maite (SQL en sección 5 de este documento)
 - Migrar `LessonNotes` de localStorage a tabla `user_notes` (Fase 6)
 - Poblar tabla `lessons` o conectar CMS real (Sanity recomendado)
 - Implementar integración Tally.so
