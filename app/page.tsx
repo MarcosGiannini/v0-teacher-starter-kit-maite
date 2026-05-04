@@ -1,5 +1,233 @@
-import { WelcomePortal } from "@/components/welcome-portal"
+import { createClient } from '@/lib/supabase/server'
+import { Button } from '@/components/ui/button'
+import { BookOpen, Feather, Video, ArrowRight, Check, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import type { Metadata } from 'next'
 
-export default function Page() {
-  return <WelcomePortal />
+export const metadata: Metadata = {
+  title: 'Aprende español con confianza',
+  description:
+    'Plataforma de membresía para aprender español online con Maite Colodrón. Vídeos, cursos y mentoría personalizada. Niveles A1–C1, preparación DELE/SIELE.',
 }
+
+export default async function Page() {
+  const supabase = await createClient()
+  let isLoggedIn = false
+  let hasActiveSub = false
+
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser()
+    isLoggedIn = !!user
+
+    if (user) {
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle()
+      hasActiveSub = !!sub
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-secondary/8 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+
+      <main className="relative container mx-auto px-6 py-16 md:py-28 max-w-4xl">
+
+        {/* Hero */}
+        <header className="text-center mb-20">
+          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-secondary/15 text-foreground/80 mb-10 border border-secondary/25">
+            <Feather className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} />
+            <span className="text-sm tracking-wide">Aprende español con propósito</span>
+          </div>
+
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-light text-foreground mb-6 tracking-tight text-balance leading-tight">
+            Habla español con{" "}
+            <span className="font-medium italic">confianza</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground font-light tracking-wide max-w-2xl mx-auto text-pretty mb-10">
+            Clases y recursos de{" "}
+            <span className="font-serif italic text-foreground">Maite Colodrón</span>{" "}
+            adaptados a tu nivel y ritmo de vida
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {isLoggedIn && hasActiveSub ? (
+              <Button asChild size="lg" className="bg-[oklch(0.72_0.12_75)] hover:bg-[oklch(0.68_0.14_75)] text-[oklch(0.22_0.025_45)] font-medium shadow-md hover:shadow-lg transition-all px-8 border border-[oklch(0.65_0.12_75)]">
+                <Link href="/dashboard">
+                  Ir a mis materiales
+                  <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+                </Link>
+              </Button>
+            ) : isLoggedIn ? (
+              <>
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all px-8">
+                  <Link href="/pricing">
+                    Empezar ahora
+                    <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="border-primary/25 text-foreground hover:bg-primary/8 px-8">
+                  <Link href="/dashboard">Mi cuenta</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all px-8">
+                  <Link href="/signup">
+                    Empezar ahora
+                    <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="border-primary/25 text-foreground hover:bg-primary/8 px-8">
+                  <Link href="/login">Ya tengo cuenta</Link>
+                </Button>
+              </>
+            )}
+          </div>
+        </header>
+
+        {/* Sobre mí */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-24">
+          <div className="space-y-6 order-2 md:order-1">
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-primary/70">Tu profesora</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-light text-foreground leading-snug">
+              Mucho más que gramática:{" "}
+              <span className="italic">una inmersión en el español real</span>
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Soy Maite Colodrón. Tras más de 12 años acompañando a estudiantes de todo el mundo,
+              he aprendido que hablar un idioma no es conjugar verbos,{" "}
+              <span className="font-serif italic text-foreground">es habitar una cultura</span>.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              Mi método fusiona la rigurosidad lingüística con la historia y la literatura,
+              eliminando los estereotipos para que aprendas a pensar en español.
+              No busco que seas un turista, busco que seas un hablante con{" "}
+              <span className="font-serif italic text-foreground">confianza y propósito</span>.
+            </p>
+          </div>
+
+          {/* Placeholder foto */}
+          <div className="relative order-1 md:order-2 mx-auto w-full max-w-xs aspect-[3/4] rounded-3xl bg-secondary/20 border border-secondary/30 overflow-hidden flex items-end justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/15 via-background/20 to-primary/8" />
+            <p className="relative z-10 pb-6 text-xs text-muted-foreground/50 tracking-widest uppercase">Foto de Maite</p>
+          </div>
+        </section>
+
+        {/* Feature pills */}
+        <section className="flex flex-wrap justify-center gap-3 mb-20">
+          {[
+            "Niveles A1 a C1",
+            "Clases en vídeo",
+            "Material descargable",
+            "Comunidad privada",
+            "Certificaciones DELE/SIELE",
+            "Mentoría 1-a-1",
+          ].map((feat) => (
+            <span
+              key={feat}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card/70 border border-border/30 text-sm text-foreground/70 backdrop-blur-sm"
+            >
+              <Check className="h-3.5 w-3.5 text-primary shrink-0" strokeWidth={2} />
+              {feat}
+            </span>
+          ))}
+        </section>
+
+        {/* Plans overview */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+          {[
+            { icon: Video,    title: "Cápsulas A1/A2",    desc: "Aprendizaje autónomo. Píldoras de vídeo semanales + material descargable para construir tus cimientos sin prisa pero sin pausa.",                 price: "19€/mes",  plan: "capsulas-a1" },
+            { icon: BookOpen, title: "Cornelia B1+",        desc: "Cultura y Conversación. Un viaje a través de la literatura y la prensa actual para dominar el nivel intermedio mediante el análisis y el debate.", price: "49€/mes",  plan: "cursos-b1-cornelia" },
+            { icon: Feather,  title: "Mentoría 1-a-1",     desc: "Acompañamiento personalizado. Sesiones de 30 min para resolver dudas específicas y acelerar tu fluidez.",                                         price: "149€/mes", plan: "mentorship" },
+          ].map(({ icon: Icon, title, desc, price, plan }) => (
+            <Link
+              key={title}
+              href={`/pricing`}
+              className="group bg-card/70 border border-border/30 rounded-2xl p-6 backdrop-blur-sm text-center hover:border-primary/40 hover:shadow-lg hover:bg-card transition-all duration-300 block"
+            >
+              <div className="mx-auto w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
+                <Icon className="h-5 w-5 text-primary" strokeWidth={1.25} />
+              </div>
+              <h3 className="font-serif text-lg font-normal text-foreground mb-2">{title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">{desc}</p>
+              <span className="inline-block text-sm font-medium text-primary border border-primary/20 rounded-full px-3 py-1 group-hover:bg-primary/8 transition-colors">{price}</span>
+            </Link>
+          ))}
+        </section>
+
+        {/* CTA bottom */}
+        <div className="text-center mb-24">
+          <Button asChild variant="outline" className="border-primary/25 text-foreground hover:bg-primary/8">
+            <Link href="/pricing">Ver todos los planes →</Link>
+          </Button>
+        </div>
+
+        {/* FAQ */}
+        <section className="mb-20">
+          <h2 className="font-serif text-3xl font-light text-center text-foreground mb-10">
+            Preguntas frecuentes
+          </h2>
+          <div className="space-y-4 max-w-2xl mx-auto">
+            {[
+              {
+                q: "¿Necesito conocimientos previos de español?",
+                a: "No. Las Cápsulas A1 están diseñadas para empezar desde cero. Si ya tienes base, los Cursos B1 o Mentorship se adaptan a tu nivel.",
+              },
+              {
+                q: "¿Puedo cancelar mi membresía en cualquier momento?",
+                a: "Sí, sin permanencia ni penalizaciones. Cancelas desde tu área de cliente y mantienes el acceso hasta el fin del período pagado.",
+              },
+              {
+                q: "¿Qué diferencia hay entre los cursos y la mentoría?",
+                a: "Los cursos son contenido estructurado que sigues a tu ritmo. La Mentoría añade sesiones 1-a-1 con Maite, feedback personalizado y un plan diseñado para tus objetivos concretos.",
+              },
+              {
+                q: "¿Los materiales están disponibles tras cancelar?",
+                a: "Durante tu membresía activa tienes acceso completo. Al cancelar, el acceso se cierra al finalizar el ciclo de facturación.",
+              },
+              {
+                q: "¿Se puede preparar el DELE con estos cursos?",
+                a: "Sí. El contenido incluye práctica de las competencias que evalúa el DELE (comprensión, expresión oral y escrita). La Mentoría permite un plan de preparación específico al examen.",
+              },
+            ].map(({ q, a }) => (
+              <details
+                key={q}
+                className="group bg-card/60 border border-border/25 rounded-2xl px-6 py-5 cursor-pointer hover:border-primary/25 transition-colors"
+              >
+                <summary className="flex items-center justify-between gap-4 list-none text-foreground font-medium select-none">
+                  {q}
+                  <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform group-open:rotate-180" strokeWidth={1.5} />
+                </summary>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+      </main>
+
+      {/* Footer */}
+      <footer className="relative py-10 mt-8 border-t border-border/20">
+        <div className="container mx-auto px-6 max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            © 2026{" "}
+            <span className="font-serif italic text-foreground">Super Teacher</span>
+            {" "}· Maite Colodrón
+          </p>
+          <nav className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/pricing"                                                    className="hover:text-primary transition-colors">Planes</Link>
+            <Link href="/login"                                                      className="hover:text-primary transition-colors">Acceder</Link>
+            <Link href="https://wa.me/34600000000" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contacto vía WhatsApp</Link>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  )
+}
+

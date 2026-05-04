@@ -13,7 +13,7 @@ const plans = [
     price: "19",
     period: "/mes",
     description:
-      "El punto de partida para aprender alemán desde cero con vídeos breves, vocabulario esencial y recursos descargables.",
+      "El punto de partida para aprender español desde cero con vídeos breves, vocabulario esencial y recursos descargables.",
     features: [
       "Cápsulas de vídeo (5–10 min) semanales",
       "PDFs de vocabulario y gramática A1/A2",
@@ -22,7 +22,7 @@ const plans = [
       "Actualizaciones mensuales de contenido",
     ],
     cta: "Empezar ahora",
-    ctaHref: "https://tally.so/r/GxLKWL?origen=capsulas_a1",
+    ctaHref: "/api/checkout?plan=capsulas-a1",
     variant: "default" as const,
     highlight: false,
   },
@@ -31,21 +31,21 @@ const plans = [
     icon: BookOpen,
     label: "Más popular",
     title: "Cursos B1 Cornelia",
-    subtitle: "Alemán intermedio",
+    subtitle: "Español intermedio",
     price: "49",
     period: "/mes",
     description:
-      "Domina el nivel intermedio a través de la novela Cornelia y temas de actualidad cultural alemana.",
+      "Domina el nivel intermedio a través de la novela Cornelia y temas de actualidad cultural española.",
     features: [
       "Todo lo incluido en Cápsulas A1",
       "Curso completo basado en Cornelia",
       "Lecturas de actualidad con análisis",
       "Sesiones de conversación en grupo (2×/mes)",
       "Corrección de textos escritos",
-      "Material de examen TELC/Goethe B1",
+      "Material de examen DELE/SIELE B1",
     ],
     cta: "Quiero este plan",
-    ctaHref: "https://tally.so/r/GxLKWL?origen=cursos_b1_cornelia",
+    ctaHref: "/api/checkout?plan=cursos-b1-cornelia",
     variant: "featured" as const,
     highlight: true,
   },
@@ -58,7 +58,7 @@ const plans = [
     price: "149",
     period: "/mes",
     description:
-      "Un programa de transformación lingüística con atención individualizada para alcanzar tus objetivos en alemán.",
+      "Un programa de transformación lingüística con atención individualizada para alcanzar tus objetivos en español.",
     features: [
       "Todo lo incluido en Cursos B1 Cornelia",
       "Sesiones 1-a-1 con Maite (4×/mes)",
@@ -68,7 +68,7 @@ const plans = [
       "Preparación intensiva para certificados oficiales",
     ],
     cta: "Solicitar plaza",
-    ctaHref: "https://tally.so/r/GxLKWL?origen=mentorship",
+    ctaHref: "/api/checkout?plan=mentorship",
     variant: "outline" as const,
     highlight: false,
   },
@@ -94,7 +94,7 @@ export default function PricingPage() {
             <span className="font-medium italic">precios</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground font-light tracking-wide max-w-2xl mx-auto text-pretty">
-            Aprende alemán con{" "}
+            Aprende español con{" "}
             <span className="font-serif italic text-foreground">Maite Colodrón</span>{" "}
             al ritmo que necesitas
           </p>
@@ -197,9 +197,9 @@ export default function PricingPage() {
                     ].join(" ")}
                     variant={isFeatured ? "default" : "outline"}
                   >
-                    <a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
+                    <Link href={plan.ctaHref}>
                       {plan.cta}
-                    </a>
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
