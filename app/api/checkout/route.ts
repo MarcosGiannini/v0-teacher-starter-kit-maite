@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   }
 
   // --- 3. Validar y sanear clave de Stripe ---
-  const rawKey = process.env.STRIPE_SECRET_KEY
+  const rawKey = process.env.STRIPE_SECRET_KEY?.trim()
   if (!rawKey || rawKey.trim() === "") {
     console.error("[Checkout] STRIPE_SECRET_KEY no está configurado")
     return NextResponse.json(
