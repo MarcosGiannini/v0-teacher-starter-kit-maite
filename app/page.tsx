@@ -142,20 +142,22 @@ export default async function Page() {
         {/* Plans overview */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           {[
-            { icon: Video,    title: "Cápsulas A1/A2",    desc: "Aprendizaje autónomo. Píldoras de vídeo semanales + material descargable para construir tus cimientos sin prisa pero sin pausa.",                 price: "19€/mes",  plan: "capsulas-a1" },
-            { icon: BookOpen, title: "Cornelia B1+",        desc: "Cultura y Conversación. Un viaje a través de la literatura y la prensa actual para dominar el nivel intermedio mediante el análisis y el debate.", price: "49€/mes",  plan: "cursos-b1-cornelia" },
-            { icon: Feather,  title: "Mentoría 1-a-1",     desc: "Acompañamiento personalizado. Sesiones de 30 min para resolver dudas específicas y acelerar tu fluidez.",                                         price: "149€/mes", plan: "mentorship" },
+            { icon: Video,    title: "Cápsulas A1/A2",  desc: "Cimientos sólidos. Píldoras de vídeo y material descargable para avanzar a tu ritmo.",                    price: "19€/mes",  plan: "capsulas-a1" },
+            { icon: BookOpen, title: "Cornelia B1+",    desc: "Inmersión cultural. Domina el español intermedio a través de la literatura y la actualidad.",      price: "49€/mes",  plan: "cursos-b1-cornelia" },
+            { icon: Feather,  title: "Mentoría 1-a-1",  desc: "Fluidez total. Sesiones personalizadas para resolver dudas y acelerar tus resultados.",               price: "149€/mes", plan: "mentorship" },
           ].map(({ icon: Icon, title, desc, price, plan }) => (
             <Link
               key={title}
-              href={`/pricing`}
-              className="group bg-card/70 border border-border/30 rounded-2xl p-6 backdrop-blur-sm text-center hover:border-primary/40 hover:shadow-lg hover:bg-card transition-all duration-300 block"
+              href="/pricing"
+              className="group bg-card/70 border border-border/30 rounded-2xl p-6 backdrop-blur-sm text-center hover:border-primary/40 hover:shadow-lg hover:bg-card transition-all duration-300 block grid grid-rows-[auto_1fr_auto] gap-4"
             >
-              <div className="mx-auto w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
                 <Icon className="h-5 w-5 text-primary" strokeWidth={1.25} />
               </div>
-              <h3 className="font-serif text-lg font-normal text-foreground mb-2">{title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">{desc}</p>
+              <div>
+                <h3 className="font-serif text-lg font-normal text-foreground mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+              </div>
               <span className="inline-block text-sm font-medium text-primary border border-primary/20 rounded-full px-3 py-1 group-hover:bg-primary/8 transition-colors">{price}</span>
             </Link>
           ))}
@@ -223,7 +225,7 @@ export default async function Page() {
           <nav className="flex items-center gap-6 text-sm text-muted-foreground">
             <Link href="/pricing"                                                    className="hover:text-primary transition-colors">Planes</Link>
             <Link href="/login"                                                      className="hover:text-primary transition-colors">Acceder</Link>
-            <Link href="https://wa.me/34600000000" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contacto vía WhatsApp</Link>
+            <Link href="https://wa.me/34629580783" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contacto vía WhatsApp</Link>
           </nav>
         </div>
       </footer>

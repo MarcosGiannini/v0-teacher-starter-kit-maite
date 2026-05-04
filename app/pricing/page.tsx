@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Check, Sparkles, BookOpen, Users } from "lucide-react"
+import { Check, BookOpen, Users } from "lucide-react"
+import { Feather } from "lucide-react"
 import Link from "next/link"
 
 const plans = [
@@ -8,12 +9,11 @@ const plans = [
     id: "capsulas-a1",
     icon: Users,
     label: "Acceso inicial",
-    title: "Cápsulas A1",
+    title: "Cápsulas A1/A2",
     subtitle: "Membresía A1/A2",
     price: "19",
     period: "/mes",
-    description:
-      "El punto de partida para aprender español desde cero con vídeos breves, vocabulario esencial y recursos descargables.",
+    description: "Cimientos sólidos. Píldoras de vídeo y material descargable para avanzar a tu ritmo.",
     features: [
       "Cápsulas de vídeo (5–10 min) semanales",
       "PDFs de vocabulario y gramática A1/A2",
@@ -30,12 +30,11 @@ const plans = [
     id: "cursos-b1-cornelia",
     icon: BookOpen,
     label: "Más popular",
-    title: "Cursos B1 Cornelia",
+    title: "Cornelia B1+",
     subtitle: "Español intermedio",
     price: "49",
     period: "/mes",
-    description:
-      "Domina el nivel intermedio a través de la novela Cornelia y temas de actualidad cultural española.",
+    description: "Inmersión cultural. Domina el español intermedio a través de la literatura y la actualidad.",
     features: [
       "Todo lo incluido en Cápsulas A1",
       "Curso completo basado en Cornelia",
@@ -51,14 +50,13 @@ const plans = [
   },
   {
     id: "mentorship",
-    icon: Sparkles,
+    icon: Feather,
     label: "Experiencia premium",
-    title: "Mentorship",
+    title: "Mentoría 1-a-1",
     subtitle: "Acompañamiento personalizado",
     price: "149",
     period: "/mes",
-    description:
-      "Un programa de transformación lingüística con atención individualizada para alcanzar tus objetivos en español.",
+    description: "Fluidez total. Sesiones personalizadas para resolver dudas y acelerar tus resultados.",
     features: [
       "Todo lo incluido en Cursos B1 Cornelia",
       "Sesiones 1-a-1 con Maite (4×/mes)",
@@ -85,7 +83,7 @@ export default function PricingPage() {
         {/* Header */}
         <header className="text-center mb-20">
           <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-secondary/15 text-foreground/80 mb-10 border border-secondary/25">
-            <Sparkles className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} />
+            <Feather className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} />
             <span className="text-sm tracking-wide">Elige tu camino</span>
           </div>
 
