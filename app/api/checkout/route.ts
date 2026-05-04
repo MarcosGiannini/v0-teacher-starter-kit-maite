@@ -64,9 +64,10 @@ export async function GET(request: NextRequest) {
 
   console.log("[Checkout] 🔑 Longitud de la clave (sin espacios):", secretKey.length, "| Prefijo:", secretKey.slice(0, 12))
 
-  // --- 4. Obtener email del usuario logueado en Supabase ---
+  // --- 4. Obtener email e ID del usuario logueado en Supabase ---
   const supabase = await createClient()
   let customerEmail: string | undefined
+  let userId: string | undefined
 
   if (supabase) {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -75,6 +76,7 @@ export async function GET(request: NextRequest) {
     } else {
       console.log(`[Checkout] ✅ Usuario identificado: ${user?.email ?? "anónimo"}`)
       customerEmail = user?.email ?? undefined
+      userId = user?.id ?? undefined
     }
   } else {
     console.warn("[Checkout] ⚠️  Cliente Supabase no disponible, se procederá sin email.")
@@ -91,6 +93,8 @@ export async function GET(request: NextRequest) {
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       ...(customerEmail ? { customer_email: customerEmail } : {}),
+      // client_reference_id = Supabase user ID → el webhook lo usa para actualizar la suscripción
+      ...(userId ? { client_reference_id: userId } : {}),
       success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${origin}/pricing`,
       metadata: { plan },
