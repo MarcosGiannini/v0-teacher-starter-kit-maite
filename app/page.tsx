@@ -42,10 +42,10 @@ export default async function Page() {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-secondary/8 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none" aria-hidden="true" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" aria-hidden="true" />
 
-      <main className="relative mx-auto w-full max-w-screen-md px-4 sm:px-6 py-12 sm:py-16 md:py-28">
+      <main className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 py-16 sm:py-20 md:py-32">
 
         {/* Hero */}
-        <header className="text-center mb-16 sm:mb-20">
+        <header className="text-center mb-20 sm:mb-28">
           <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-secondary/15 text-foreground/80 mb-8 sm:mb-10 border border-secondary/25">
             <Feather className="h-4 w-4 text-secondary-foreground" strokeWidth={1.5} aria-hidden="true" />
             <span className="text-sm tracking-wide">{CONTENT.hero.badge}</span>
@@ -98,10 +98,10 @@ export default async function Page() {
         </header>
 
         {/* Sobre mí */}
-        <section aria-labelledby="about-heading" className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center mb-20 sm:mb-24">
+        <section aria-labelledby="about-heading" className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-10 md:gap-16 items-center mb-24 sm:mb-32">
           <div className="space-y-5 order-2 md:order-1">
             <p className="text-xs font-medium tracking-[0.2em] uppercase text-primary/70">{CONTENT.about.label}</p>
-            <h2 id="about-heading" className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-foreground leading-snug">
+            <h2 id="about-heading" className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-foreground leading-snug">
               {CONTENT.about.heading}{" "}
               <span className="italic">{CONTENT.about.headingItalic}</span>
             </h2>
@@ -127,7 +127,7 @@ export default async function Page() {
         </section>
 
         {/* Feature pills */}
-        <section aria-label="Características incluidas" className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-16 sm:mb-20">
+        <section aria-label="Características incluidas" className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-20 sm:mb-28">
           {CONTENT.pills.map((feat) => (
             <span
               key={feat}
@@ -140,7 +140,7 @@ export default async function Page() {
         </section>
 
         {/* Plans overview */}
-        <section aria-labelledby="plans-heading" className="mb-16 sm:mb-20">
+        <section aria-labelledby="plans-heading" className="mb-20 sm:mb-28">
           <h2 id="plans-heading" className="sr-only">Planes disponibles</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
             {CONTENT.plans.map(({ title, desc, price }, i) => {
@@ -167,14 +167,14 @@ export default async function Page() {
         </section>
 
         {/* CTA bottom */}
-        <div className="text-center mb-20 sm:mb-24">
+        <div className="text-center mb-24 sm:mb-32">
           <Button asChild variant="outline" className="border-primary/25 text-foreground hover:bg-primary/8">
             <Link href="/pricing">{CONTENT.cta}</Link>
           </Button>
         </div>
 
         {/* FAQ */}
-        <section aria-labelledby="faq-heading" className="mb-16 sm:mb-20">
+        <section aria-labelledby="faq-heading" className="mb-20 sm:mb-28">
           <h2 id="faq-heading" className="font-serif text-2xl sm:text-3xl font-light text-center text-foreground mb-8 sm:mb-10">
             {CONTENT.faq.heading}
           </h2>
@@ -198,7 +198,7 @@ export default async function Page() {
 
       {/* Footer */}
       <footer className="relative py-8 sm:py-10 mt-6 sm:mt-8 border-t border-border/20">
-        <div className="mx-auto w-full max-w-screen-md px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground text-center sm:text-left">
             {CONTENT.footer.copy}{" "}
             <span className="font-serif italic text-foreground">{CONTENT.footer.brand}</span>

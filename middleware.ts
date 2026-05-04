@@ -63,6 +63,19 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
 
+    // Ruta de administración: solo accesible con rol 'admin' en app_metadata
+    // El rol debe establecerse desde Supabase Dashboard o vía service_role:
+    //   UPDATE auth.users SET raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}'
+    //   WHERE email = 'maite@superteacher.es';
+    if (user && pathname.startsWith('/dashboard/admin')) {
+      const isAdmin = user.app_metadata?.role === 'admin'
+      if (!isAdmin) {
+        const dashboardUrl = request.nextUrl.clone()
+        dashboardUrl.pathname = '/dashboard'
+        return NextResponse.redirect(dashboardUrl)
+      }
+    }
+
     // Si ya está logueado, no tiene sentido volver a /login o /signup
     if (user && (pathname === '/login' || pathname === '/signup')) {
       const dashboardUrl = request.nextUrl.clone()
