@@ -39,7 +39,8 @@ export async function GET(request: NextRequest) {
   }
 
   // --- 3. Validar y sanear clave de Stripe ---
-  console.log("DEBUG: La clave empieza por:", process.env.STRIPE_SECRET_KEY?.substring(0, 7))
+  console.log("DEBUG: La clave empieza por:", process.env.STRIPE_SECRET_KEY?.trim().substring(0, 7))
+  console.log("DEBUG: La clave termina en:", process.env.STRIPE_SECRET_KEY?.trim().slice(-4))
 
   const rawKey = process.env.STRIPE_SECRET_KEY
   if (!rawKey || rawKey.trim() === "") {
