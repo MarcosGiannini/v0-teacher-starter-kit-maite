@@ -261,6 +261,55 @@ if (user.app_metadata?.role !== 'admin') redirect('/dashboard')
 
 ---
 
+## 📅 CONCIENCIA DE FECHA Y VERSIONES — OBLIGATORIO
+
+**La fecha actual se proporciona en cada sesión. Úsala.**
+
+Antes de dar cualquier instrucción sobre una interfaz externa (Vercel, Supabase, Stripe, GitHub, etc.):
+- Verificar que las instrucciones corresponden a la UI de esa fecha, no a versiones antiguas.
+- Si hay duda sobre si la UI ha cambiado, indicarlo explícitamente.
+- Nunca asumir que una ruta de menú sigue siendo la misma que hace 1-2 años.
+
+Las interfaces que cambian con frecuencia en este proyecto:
+- **Vercel Dashboard** (restructurado en 2024-2025): Environment Variables está en Settings → Environment Variables (menú lateral izquierdo)
+- **Supabase Dashboard** (restructurado en 2024-2026): las API keys están en Settings → API (icono engranaje en el menú izquierdo, al fondo)
+- **Stripe Dashboard** (2026): API Keys en Developers → API keys; Webhooks en Developers → Webhooks
+
+---
+
+## 🗺 INSTRUCCIONES AL USUARIO — ESTÁNDAR DE CLARIDAD OBLIGATORIO
+
+Cuando la IA necesite que el usuario realice una acción manual (en navegador, panel externo, terminal), SIEMPRE seguir este formato:
+
+### Formato obligatorio para instrucciones manuales
+
+```
+📍 Dónde ir:
+   URL exacta o ruta de menús paso a paso (texto, no suposiciones)
+
+👆 Qué hacer (paso a paso numerado):
+   1. Clic en X
+   2. Busca la sección Y
+   3. El valor que necesitas está en Z — haz clic en el icono 👁 para revelarlo
+
+📋 Cómo usarlo:
+   - Borra el placeholder completo (incluyendo < y >) y pega el valor real
+   - No dejes espacios antes ni después del valor
+   - El valor SÍ incluye el prefijo (ej: eyJ..., sk_test_..., whsec_...)
+
+⚠️ Si no ves lo que describes:
+   Pide un pantallazo antes de continuar. No improvises.
+```
+
+### Reglas adicionales de claridad
+
+- **Nunca usar `...`** para indicar que falta un valor — escribir exactamente qué formato tiene el valor real (ej: "empieza por `eyJ` y tiene ~200 caracteres")
+- **Nunca usar `<placeholder>`** sin explicar exactamente de dónde viene el valor real
+- **Si los valores de Vercel aparecen vacíos al editar**: es normal — Vercel enmascara las variables sensibles una vez guardadas. El valor real debe obtenerse del servicio origen (Supabase, Stripe, etc.), no de Vercel.
+- **Si falta contexto**: pedir pantallazo antes de dar instrucciones incorrectas. Mejor preguntar que equivocarse.
+
+---
+
 ## ✅ PROTOCOLO DE VERIFICACIÓN — OBLIGATORIO TRAS CADA CAMBIO
 
 **Al terminar cualquier implementación, la IA SIEMPRE debe:**
