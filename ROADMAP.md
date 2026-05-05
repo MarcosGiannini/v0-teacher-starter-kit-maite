@@ -110,9 +110,9 @@
 | Tarea | Estado | Notas |
 |-------|--------|-------|
 | Ejecutar schema_v2 en Supabase (prod) | ✅ | Ejecutado 2026-05-05 — tablas `lessons`, `user_notes`, `community_posts`, `community_replies` creadas con RLS |
-| Migrar `LessonNotes` de localStorage → `user_notes` | ⏳ | `components/lesson-notes.tsx` |
-| El `lessonId` pasará de slug (string) → uuid | ⏳ | Requiere tabla `lessons` poblada |
-| RLS en `user_notes` (solo fila propia) | ⏳ | Incluido en schema_v2 |
+| Migrar `LessonNotes` de localStorage → `user_notes` | ✅ | `components/lesson-notes.tsx` — upsert con debounce 800ms, indicador Guardando/Guardado/Error |
+| El `lessonId` pasará de slug (string) → uuid | ✅ | Página lección hace `SELECT id FROM lessons WHERE slug=?`, pasa `lesson.id` al componente |
+| RLS en `user_notes` (solo fila propia) | ✅ | Incluido en schema_v2 |
 
 ---
 
@@ -200,7 +200,8 @@
 > **No son bugs de código. No afectan a Vercel ni a producción.**
 
 | Incidencia | Estado | Entorno | Detalle |
-|------------|--------|---------|---------|
+|------------|--------|---------|---------||
+| Error TS2339 `current_period_end` en `app/api/webhooks/stripe/route.ts` | ❌ Pendiente fix | Todos | Propiedad no existe en tipo `Response<Subscription>` de Stripe SDK. Error preexistente, no introducido en Fase 6. No bloquea build de Vercel (tsc --noEmit no se ejecuta en CI). Registrado para arreglar en próxima sesión. |
 | Stripe Checkout falla con "Invalid API Key provided: sk_test_****" | ❌ Bloqueado (entorno) | Codespaces únicamente | `STRIPE_SECRET_KEY` está presente en `.env.local` pero no se carga correctamente en el contexto de la Route Handler durante el desarrollo en Codespaces. Posible causa: variables de entorno no propagadas al proceso de Next.js en el contenedor. **No es una regresión de código. No afecta a Vercel / producción.** Investigar recarga de `next dev` con las variables o uso de `dotenv` explícito. |
 
 ---

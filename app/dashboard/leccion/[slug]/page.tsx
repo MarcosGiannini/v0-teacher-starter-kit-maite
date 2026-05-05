@@ -1,31 +1,28 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation'
 import { LessonNotes } from '@/components/lesson-notes'
 import { BookOpen, Clock, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 
-/**
- * Página de detalle de lección — PLACEHOLDER (Fase 5)
- *
- * Estado actual:
- *   - Protegida por auth (requiere suscripción activa)
- *   - Muestra un placeholder de vídeo y el componente LessonNotes (PoC localStorage)
- *   - Los datos de lección son estáticos — pendiente integrar con CMS o tabla `lessons`
- *
- * Evolución prevista (Fase 6):
- *   - Leer lección real desde tabla `lessons` por `params.slug`
- *   - Integrar player de vídeo (Vimeo/YouTube embed o CMS)
- *   - Persistir apuntes en tabla `user_notes` (schema en supabase/schema_v2.sql)
- */
+/** Forma de la fila de la tabla `lessons` que usamos en esta página */
+interface LessonRow {
+  id: string
+  slug: string
+  title: string
+  description: string | null
+  plan_id: string
+  duration_s: number | null
+}
 
-// Placeholder data — se reemplazará por fetch real a CMS o tabla lessons
-const PLACEHOLDER_LESSON = {
-  id: 'lesson-placeholder',
-  slug: 'a1-01-presentaciones',
-  title: 'Lección 1 — Presentaciones en español',
-  description: 'Aprende a presentarte en español con confianza: nombre, origen, profesión y gustos personales.',
-  duration: '8 min',
-  plan: 'Cápsulas A1/A2',
+const PLAN_LABELS: Record<string, string> = {
+  'capsulas-a1': 'Cápsulas A1/A2',
+  'cursos-b1-cornelia': 'B1+ con Cornelia',
+  'mentorship': 'Mentoría 1-a-1',
+}
+
+function formatDuration(seconds: number | null): string {
+  if (!seconds) return ''
+  return `${Math.round(seconds / 60)} min`
 }
 
 export default async function LessonPage({
@@ -51,15 +48,14 @@ export default async function LessonPage({
 
   if (!sub) redirect('/pricing')
 
-  // TODO (Fase 6): obtener lección real por slug
-  // const { data: lesson } = await supabase
-  //   .from('lessons')
-  //   .select('*')
-  //   .eq('slug', slug)
-  //   .single()
-  // if (!lesson) notFound()
+  // Obtener lección real desde la tabla `lessons`
+  const { data: lesson } = await supabase
+    .from('lessons')
+    .select('id, slug, title, description, plan_id, duration_s')
+    .eq('slug', slug)
+    .single<LessonRow>()
 
-  const lesson = { ...PLACEHOLDER_LESSON, slug }
+  if (!lesson) notFound()
 
   return (
     <main className="min-h-screen bg-background px-4 py-10">
@@ -79,15 +75,21 @@ export default async function LessonPage({
         <header className="space-y-3">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <BookOpen className="h-3.5 w-3.5 text-primary" aria-hidden="true" strokeWidth={1.5} />
-            <span>{lesson.plan}</span>
-            <span aria-hidden="true">·</span>
-            <Clock className="h-3.5 w-3.5" aria-hidden="true" strokeWidth={1.5} />
-            <span>{lesson.duration}</span>
+            <span>{PLAN_LABELS[lesson.plan_id] ?? lesson.plan_id}</span>
+            {lesson.duration_s && (
+              <>
+                <span aria-hidden="true">·</span>
+                <Clock className="h-3.5 w-3.5" aria-hidden="true" strokeWidth={1.5} />
+                <span>{formatDuration(lesson.duration_s)}</span>
+              </>
+            )}
           </div>
           <h1 className="font-serif text-3xl md:text-4xl font-light text-foreground leading-snug">
             {lesson.title}
           </h1>
-          <p className="text-muted-foreground leading-relaxed">{lesson.description}</p>
+          {lesson.description && (
+            <p className="text-muted-foreground leading-relaxed">{lesson.description}</p>
+          )}
         </header>
 
         {/* Video placeholder */}
@@ -106,8 +108,8 @@ export default async function LessonPage({
           </p>
         </div>
 
-        {/* Notes — PoC con localStorage */}
-        <LessonNotes lessonId={lesson.slug} />
+        {/* Apuntes persistidos en Supabase */}
+        <LessonNotes lessonId={lesson.id} userId={user.id} />
 
       </div>
     </main>

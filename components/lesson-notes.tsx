@@ -1,88 +1,95 @@
 'use client'
 
-/**
- * LessonNotes — Componente de apuntes por lección
- *
- * ESTADO ACTUAL (Fase 5 — Proof of Concept):
- *   Los apuntes se guardan en localStorage bajo la clave `notes:${lessonId}`.
- *   No requiere autenticación ni llamadas a la API.
- *
- * EVOLUCIÓN PREVISTA (Fase 6 — Producción):
- *   1. Reemplazar localStorage por una llamada a Supabase:
- *        upsert({ user_id, lesson_id, content }) en tabla `user_notes`
- *   2. Añadir debounce (≥800 ms) en handleChange para evitar escrituras excesivas
- *   3. Mostrar indicador de estado: "Guardando…" / "Guardado ✓" / "Error"
- *   4. El esquema de base de datos ya está en supabase/schema_v2.sql
- */
-
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { NotebookPen, Save } from 'lucide-react'
+import { NotebookPen, Save, AlertCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 interface LessonNotesProps {
-  /** ID único de la lección (para aislar las notas en localStorage) */
+  /** UUID de la lección (de tabla lessons.id) */
   lessonId: string
+  /** UUID del usuario autenticado (del Server Component padre) */
+  userId: string
   /** Textos para i18n */
   labels?: {
     heading: string
     placeholder: string
-    savedAt: string
-    localStorageNote: string
+    saving: string
+    saved: string
+    error: string
   }
 }
 
 const DEFAULT_LABELS = {
   heading: 'Mis apuntes',
   placeholder: 'Escribe aquí tus notas sobre esta lección…',
-  savedAt: 'Guardado',
-  localStorageNote: 'Guardado localmente en este dispositivo (PoC)',
+  saving: 'Guardando…',
+  saved: 'Guardado',
+  error: 'Error al guardar',
 }
 
-const STORAGE_KEY_PREFIX = 'super-teacher:notes:'
-const AUTOSAVE_DELAY_MS  = 600
+const AUTOSAVE_DELAY_MS = 800
 
-export function LessonNotes({ lessonId, labels = DEFAULT_LABELS }: LessonNotesProps) {
-  const [content,   setContent]   = useState('')
-  const [savedAt,   setSavedAt]   = useState<Date | null>(null)
-  const [mounted,   setMounted]   = useState(false)
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+
+export function LessonNotes({ lessonId, userId, labels = DEFAULT_LABELS }: LessonNotesProps) {
+  const [content,    setContent]    = useState('')
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
+  const [savedAt,    setSavedAt]    = useState<Date | null>(null)
+  const [mounted,    setMounted]    = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const storageKey  = `${STORAGE_KEY_PREFIX}${lessonId}`
 
-  // Read from localStorage after mount (avoids hydration mismatch)
+  // Cargar apuntes existentes desde Supabase al montar
   useEffect(() => {
     setMounted(true)
-    try {
-      const stored = window.localStorage.getItem(storageKey)
-      if (stored) setContent(stored)
-    } catch {
-      // localStorage unavailable (private mode, permissions, etc.) — fail silently
-    }
-  }, [storageKey])
+    const supabase = createClient()
+    if (!supabase) return
 
-  const saveToStorage = useCallback((value: string) => {
-    try {
-      window.localStorage.setItem(storageKey, value)
+    supabase
+      .from('user_notes')
+      .select('content')
+      .eq('lesson_id', lessonId)
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.content) setContent(data.content)
+      })
+  }, [lessonId, userId])
+
+  const saveToSupabase = useCallback(async (value: string) => {
+    const supabase = createClient()
+    if (!supabase) return
+
+    setSaveStatus('saving')
+
+    const { error } = await supabase
+      .from('user_notes')
+      .upsert(
+        { user_id: userId, lesson_id: lessonId, content: value },
+        { onConflict: 'user_id,lesson_id' },
+      )
+
+    if (error) {
+      setSaveStatus('error')
+    } else {
+      setSaveStatus('saved')
       setSavedAt(new Date())
-    } catch {
-      // Ignore quota exceeded or unavailable storage
     }
-  }, [storageKey])
+  }, [lessonId, userId])
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const value = e.target.value
     setContent(value)
 
-    // Debounced autosave
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => saveToStorage(value), AUTOSAVE_DELAY_MS)
+    debounceRef.current = setTimeout(() => saveToSupabase(value), AUTOSAVE_DELAY_MS)
   }
 
-  // Cleanup debounce on unmount
+  // Limpiar debounce al desmontar
   useEffect(() => () => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }, [])
 
   if (!mounted) {
-    // Skeleton placeholder to avoid layout shift
     return (
       <div className="rounded-2xl border border-border/25 bg-card/60 p-5 animate-pulse">
         <div className="h-4 w-24 bg-muted rounded mb-3" />
@@ -106,12 +113,26 @@ export function LessonNotes({ lessonId, labels = DEFAULT_LABELS }: LessonNotesPr
           {labels.heading}
         </h2>
 
-        {savedAt && (
-          <span className="flex items-center gap-1 text-xs text-muted-foreground" aria-live="polite">
-            <Save className="h-3 w-3 shrink-0" aria-hidden="true" strokeWidth={1.5} />
-            {labels.savedAt} {savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        )}
+        <span className="flex items-center gap-1 text-xs text-muted-foreground" aria-live="polite">
+          {saveStatus === 'saving' && (
+            <>
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/60 animate-pulse" aria-hidden="true" />
+              {labels.saving}
+            </>
+          )}
+          {saveStatus === 'saved' && savedAt && (
+            <>
+              <Save className="h-3 w-3 shrink-0" aria-hidden="true" strokeWidth={1.5} />
+              {labels.saved} {savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </>
+          )}
+          {saveStatus === 'error' && (
+            <>
+              <AlertCircle className="h-3 w-3 shrink-0 text-destructive" aria-hidden="true" strokeWidth={1.5} />
+              <span className="text-destructive">{labels.error}</span>
+            </>
+          )}
+        </span>
       </div>
 
       {/* Textarea */}
@@ -130,12 +151,7 @@ export function LessonNotes({ lessonId, labels = DEFAULT_LABELS }: LessonNotesPr
           'transition-colors',
         ].join(' ')}
       />
-
-      {/* localStorage disclaimer */}
-      <p className="text-xs text-muted-foreground/60 flex items-center gap-1.5">
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" aria-hidden="true" />
-        {labels.localStorageNote}
-      </p>
     </section>
   )
 }
+
