@@ -1,0 +1,189 @@
+# ROADMAP — Super Teacher Platform
+
+> Documento vivo. **Actualizar tras cada cambio.**
+> Última actualización: 2026-05-05
+> Fuente de verdad técnica complementaria: `AI_CONTEXT.md`
+
+---
+
+## Convención de estados
+
+| Símbolo | Significado |
+|---------|-------------|
+| ✅ | Completado y en producción / rama main |
+| 🔄 | En progreso (rama activa) |
+| ⏳ | Pendiente — próxima prioridad |
+| 🔮 | Planificado — futura fase |
+| ❌ | Bloqueado (motivo indicado) |
+| 🚫 | Descartado |
+
+---
+
+## FASE 1 — Base Auth + DB ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Auth Supabase: login, signup, logout | ✅ | `app/auth/actions.ts` |
+| Dashboard protegido | ✅ | `app/dashboard/page.tsx` |
+| Middleware de rutas protegidas | ✅ | `middleware.ts` |
+| Tabla `subscriptions` en Supabase | ✅ | UNIQUE constraint en `user_id` requerido |
+| Client/Server Supabase helpers | ✅ | `lib/supabase/client.ts`, `lib/supabase/server.ts` |
+
+---
+
+## FASE 2 — Stripe Checkout + Webhooks ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Endpoint `/api/checkout` | ✅ | `app/api/checkout/route.ts` |
+| Webhook `/api/webhooks/stripe` | ✅ | `app/api/webhooks/stripe/route.ts` |
+| Verificación de firma Stripe | ✅ | `STRIPE_WEBHOOK_SECRET` obligatorio |
+| Upsert en `subscriptions` con service_role | ✅ | Bypass RLS correcto |
+| 3 price IDs (A1/A2, B1+, Mentoría) | ✅ | Ver sección 4 de `AI_CONTEXT.md` |
+| Página de éxito `/registro-exitoso` | ✅ | `app/registro-exitoso/page.tsx` |
+
+---
+
+## FASE 3 — Landing + Pricing ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Landing page (Home) con SEO | ✅ | `app/page.tsx`, `generateMetadata()` |
+| CTAs dinámicos según estado auth | ✅ | Server Component, lee sesión |
+| Pricing page con 3 planes | ✅ | `app/pricing/page.tsx` |
+| Login page | ✅ | `app/login/page.tsx` |
+| Signup page | ✅ | `app/signup/page.tsx` |
+
+---
+
+## FASE 4 — Dark Mode + i18n ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Dark mode con `next-themes` | ✅ | Tokens OKLCH completos en `globals.css` |
+| i18n ES/EN cookie-based | ✅ | `lib/i18n/`, `app/actions/set-locale.ts` |
+| Traducciones centralizadas | ✅ | `lib/i18n/translations.ts` |
+| Toggle dark/light + selector idioma | ✅ | `components/site-controls.tsx` |
+| Accesibilidad (aria, semantics) | ✅ | Aria-labels, sr-only en todos los componentes |
+| Responsive (sm/md breakpoints) | ✅ | Botones full-width en mobile |
+
+---
+
+## FASE 4.5 — Refactor estético ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Layout `max-w-6xl` | ✅ | |
+| Sección Hero con más aire | ✅ | |
+| Grid Profesora 60/40 | ✅ | Placeholder foto Maite |
+| README.md profesional | ✅ | |
+
+---
+
+## FASE 5 — Contenidos + Área de Alumno ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Schema v2 SQL | ✅ | `supabase/schema_v2.sql` — diseñado, pendiente ejecutar en prod |
+| `LessonNotes` (PoC localStorage) | ✅ | `components/lesson-notes.tsx` |
+| Ruta protegida de lección | ✅ | `app/dashboard/leccion/[slug]/page.tsx` |
+| Abstracción CMS (`lib/cms-config.ts`) | ✅ | Proveedor activo: `'none'` (datos estáticos) |
+
+---
+
+## FASE 5.1 — Admin Portal ✅
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Middleware admin (`app_metadata.role`) | ✅ | `middleware.ts` → redirect si no es admin |
+| Ruta `/dashboard/admin/upload` | ✅ | `app/dashboard/admin/upload/page.tsx` |
+| Server Action `create-lesson` | ✅ | `app/actions/create-lesson.ts` |
+| Validación granular de campos | ✅ | Errores por campo, slug único |
+| `useActionState` feedback sin recarga | ✅ | Compatible React 19 |
+
+---
+
+## FASE 6 — Persistencia real de Notas ⏳
+
+> **Prerequisito**: Ejecutar `supabase/schema_v2.sql` en Supabase SQL Editor.
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Ejecutar schema_v2 en Supabase (prod) | ⏳ | Manual: Supabase SQL Editor |
+| Migrar `LessonNotes` de localStorage → `user_notes` | ⏳ | `components/lesson-notes.tsx` |
+| El `lessonId` pasará de slug (string) → uuid | ⏳ | Requiere tabla `lessons` poblada |
+| RLS en `user_notes` (solo fila propia) | ⏳ | Incluido en schema_v2 |
+
+---
+
+## FASE 7 — Listado de Lecciones en Dashboard ⏳
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Página de listado por plan en `/dashboard` | ⏳ | Actualmente vacío |
+| Poblar tabla `lessons` con contenido real | ⏳ | O conectar CMS (ver Fase 8) |
+| Navegar desde dashboard → lección individual | ⏳ | Enlaza con ruta `/dashboard/leccion/[slug]` |
+| Progreso del alumno (lección completada) | 🔮 | Requiere tabla adicional o columna en `user_notes` |
+
+---
+
+## FASE 8 — Integración CMS (Sanity recomendado) 🔮
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Instalar `next-sanity` | 🔮 | `npm install next-sanity` |
+| Configurar `NEXT_PUBLIC_SANITY_PROJECT_ID`, `DATASET`, `SANITY_API_TOKEN` | 🔮 | |
+| Cambiar `CMS_PROVIDER = 'sanity'` en `lib/cms-config.ts` | 🔮 | |
+| Implementar adaptador `getSanityLessonBySlug()` | 🔮 | |
+| Migrar datos estáticos al schema de Sanity | 🔮 | |
+
+---
+
+## FASE 9 — Comunidad Privada 🔮
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Listado de posts (`community_posts`) | 🔮 | Solo suscriptores `status = 'active'` |
+| Crear post / responder (`community_replies`) | 🔮 | |
+| Moderación admin (is_hidden, is_pinned) | 🔮 | |
+| Notificaciones de respuesta | 🔮 | |
+
+---
+
+## FASE 10 — Integración Tally.so 🔮
+
+| Tarea | Estado | Notas |
+|-------|--------|-------|
+| Página `/contacto` con formulario embebido | 🔮 | |
+| Webhook `/api/webhooks/tally` | 🔮 | Requiere `TALLY_WEBHOOK_SECRET` |
+| Registro preliminar en Supabase (pre-signup) | 🔮 | |
+| Email de bienvenida (Resend o Supabase Edge Fn) | 🔮 | |
+
+---
+
+## PRODUCCIÓN — Tareas de Configuración ⏳
+
+| Tarea | Estado | Responsable | Notas |
+|-------|--------|-------------|-------|
+| Subir foto real de Maite | ⏳ | Maite / Marcos | Reemplazar `<div>` placeholder en Hero |
+| Configurar dominio `superteacher.es` en Vercel | ⏳ | Marcos | DNS + SSL automático |
+| Reemplazar `STRIPE_WEBHOOK_SECRET` con signing secret real | ⏳ | Marcos | Desde Stripe Dashboard (producción) |
+| Crear endpoint webhook en Stripe Dashboard (prod) | ⏳ | Marcos | URL: `https://superteacher.es/api/webhooks/stripe` |
+| `ALTER TABLE subscriptions ADD CONSTRAINT ... UNIQUE (user_id)` | ⏳ | Marcos | Ejecutar en Supabase SQL Editor si no existe |
+| Asignar `role = 'admin'` a Maite en Supabase | ⏳ | Marcos | SQL en sección 5 de `AI_CONTEXT.md` |
+| Ejecutar `supabase/schema_v2.sql` en producción | ⏳ | Marcos | Cuando Fase 6 esté lista |
+
+---
+
+## Rama activa
+
+| Rama | Propósito | Estado |
+|------|-----------|--------|
+| `chore/init-roadmap` | Crear este fichero ROADMAP.md | 🔄 |
+
+---
+
+## Próxima acción recomendada
+
+> Ejecutar `supabase/schema_v2.sql` en Supabase y arrancar **Fase 6** (migrar notas de `localStorage` a `user_notes`).
+> O bien completar las tareas de **Producción** si se quiere hacer el primer deploy real.
