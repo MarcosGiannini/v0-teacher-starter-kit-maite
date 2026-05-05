@@ -170,8 +170,9 @@
 | Reemplazar `STRIPE_WEBHOOK_SECRET` con signing secret real | ⏳ | Marcos | Desde Stripe Dashboard (producción) |
 | Crear endpoint webhook en Stripe Dashboard (prod) | ⏳ | Marcos | URL: `https://superteacher.es/api/webhooks/stripe` |
 | `ALTER TABLE subscriptions ADD CONSTRAINT ... UNIQUE (user_id)` | ⏳ | Marcos | Ejecutar en Supabase SQL Editor si no existe |
-| Asignar `role = 'admin'` a Maite en Supabase | ⏳ | Marcos | SQL en sección 5 de `AI_CONTEXT.md` |
-| Ejecutar `supabase/schema_v2.sql` en producción | ⏳ | Marcos | Cuando Fase 6 esté lista |
+| Asignar `role = 'admin'` a Maite en Supabase | ⏳ | Marcos | SQL listo — pendiente ejecutar (ver instrucciones abajo) |
+| Ejecutar `supabase/schema_v2.sql` en Supabase | ⏳ | Marcos | **Siguiente paso — instrucciones abajo** |
+| Ejecutar `supabase/schema_v2.sql` en producción | ⏳ | Marcos | **Siguiente paso** |
 
 ---
 
@@ -179,11 +180,22 @@
 
 | Rama | Propósito | Estado |
 |------|-----------|--------|
-| `chore/init-roadmap` | Crear este fichero ROADMAP.md | 🔄 |
+| `main` | Todo mergeado | ✅ |
+
+---
+
+## Sesión 2026-05-05 — Fixes aplicados
+
+| Fix | Estado | Detalle |
+|-----|--------|---------|
+| `Invalid Server Actions request` en Codespace | ✅ | `next.config.mjs` → `experimental.serverActions.allowedOrigins` |
+| Supabase no configurado | ✅ | `.env.local` con credenciales reales |
+| Stripe no configurado | ✅ | `.env.local` con `sk_test_` y `pk_test_` |
+| Login funcionando en Codespace | ✅ | Verificado en navegador |
 
 ---
 
 ## Próxima acción recomendada
 
-> Ejecutar `supabase/schema_v2.sql` en Supabase y arrancar **Fase 6** (migrar notas de `localStorage` a `user_notes`).
-> O bien completar las tareas de **Producción** si se quiere hacer el primer deploy real.
+> **FASE 6 — Paso 1**: Ejecutar `supabase/schema_v2.sql` en Supabase para crear las tablas `lessons`, `user_notes`, `community_posts` y `community_replies`.
+> Después: asignar rol `admin` a Maite para que pueda acceder a `/dashboard/admin/upload`.
