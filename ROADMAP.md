@@ -195,6 +195,17 @@
 
 ---
 
+## Incidencias — Problemas de Entorno (Codespaces)
+
+> Estos problemas son específicos del entorno de desarrollo en Codespaces.
+> **No son bugs de código. No afectan a Vercel ni a producción.**
+
+| Incidencia | Estado | Entorno | Detalle |
+|------------|--------|---------|---------|
+| Stripe Checkout falla con "Invalid API Key provided: sk_test_****" | ❌ Bloqueado (entorno) | Codespaces únicamente | `STRIPE_SECRET_KEY` está presente en `.env.local` pero no se carga correctamente en el contexto de la Route Handler durante el desarrollo en Codespaces. Posible causa: variables de entorno no propagadas al proceso de Next.js en el contenedor. **No es una regresión de código. No afecta a Vercel / producción.** Investigar recarga de `next dev` con las variables o uso de `dotenv` explícito. |
+
+---
+
 ## Próxima acción recomendada
 
 > **FASE 6 — Paso 1**: Ejecutar `supabase/schema_v2.sql` en Supabase para crear las tablas `lessons`, `user_notes`, `community_posts` y `community_replies`.
