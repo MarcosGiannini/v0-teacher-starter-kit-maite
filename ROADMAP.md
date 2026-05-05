@@ -1,7 +1,7 @@
 # ROADMAP — Super Teacher Platform
 
 > Documento vivo. **Actualizar tras cada cambio.**
-> Última actualización: 2026-05-05
+> Última actualización: 2026-05-05 (schema_v2 ejecutado en producción)
 > Fuente de verdad técnica complementaria: `AI_CONTEXT.md`
 
 ---
@@ -109,7 +109,7 @@
 
 | Tarea | Estado | Notas |
 |-------|--------|-------|
-| Ejecutar schema_v2 en Supabase (prod) | ⏳ | Manual: Supabase SQL Editor |
+| Ejecutar schema_v2 en Supabase (prod) | ✅ | Ejecutado 2026-05-05 — tablas `lessons`, `user_notes`, `community_posts`, `community_replies` creadas con RLS |
 | Migrar `LessonNotes` de localStorage → `user_notes` | ⏳ | `components/lesson-notes.tsx` |
 | El `lessonId` pasará de slug (string) → uuid | ⏳ | Requiere tabla `lessons` poblada |
 | RLS en `user_notes` (solo fila propia) | ⏳ | Incluido en schema_v2 |
@@ -171,8 +171,7 @@
 | Crear endpoint webhook en Stripe Dashboard (prod) | ⏳ | Marcos | URL: `https://superteacher.es/api/webhooks/stripe` |
 | `ALTER TABLE subscriptions ADD CONSTRAINT ... UNIQUE (user_id)` | ⏳ | Marcos | Ejecutar en Supabase SQL Editor si no existe |
 | Asignar `role = 'admin'` a Maite en Supabase | ⏳ | Marcos | SQL listo — pendiente ejecutar (ver instrucciones abajo) |
-| Ejecutar `supabase/schema_v2.sql` en Supabase | ⏳ | Marcos | **Siguiente paso — instrucciones abajo** |
-| Ejecutar `supabase/schema_v2.sql` en producción | ⏳ | Marcos | **Siguiente paso** |
+| Ejecutar `supabase/schema_v2.sql` en Supabase | ✅ | Marcos | Ejecutado 2026-05-05 |
 
 ---
 
@@ -208,5 +207,5 @@
 
 ## Próxima acción recomendada
 
-> **FASE 6 — Paso 1**: Ejecutar `supabase/schema_v2.sql` en Supabase para crear las tablas `lessons`, `user_notes`, `community_posts` y `community_replies`.
-> Después: asignar rol `admin` a Maite para que pueda acceder a `/dashboard/admin/upload`.
+> **FASE 6 — Paso 2**: Migrar `LessonNotes` de localStorage → Supabase (`user_notes`).
+> Prerequisito completado: schema_v2 ejecutado en producción (2026-05-05).
