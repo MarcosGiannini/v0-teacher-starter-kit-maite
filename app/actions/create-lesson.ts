@@ -104,7 +104,12 @@ export async function createLesson(
     if (dbError.code === '23505') {
       return { success: false, fieldErrors: { slug: 'Este slug ya existe. Elige uno diferente.' } }
     }
-    console.error('[createLesson] DB error:', dbError.message)
+    // Tabla no existe → schema_v2.sql no se ha ejecutado todavía en Supabase
+    if (dbError.code === '42P01') {
+      console.error('[createLesson] La tabla "lessons" no existe. Ejecuta supabase/schema_v2.sql en el SQL Editor de Supabase.')
+      return { success: false, error: 'La base de datos no está preparada. El administrador técnico debe ejecutar schema_v2.sql en Supabase.' }
+    }
+    console.error('[createLesson] DB error:', dbError.code, dbError.message)
     return { success: false, error: 'Error al guardar la lección. Inténtalo de nuevo.' }
   }
 
