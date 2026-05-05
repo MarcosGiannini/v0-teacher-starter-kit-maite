@@ -258,3 +258,59 @@ if (user.app_metadata?.role !== 'admin') redirect('/dashboard')
 - [ ] ¿Todos los iconos tienen `aria-hidden="true"`?
 - [ ] ¿El ROADMAP.md está actualizado?
 - [ ] ¿TypeScript compila sin errores? (`tsc --noEmit`)
+
+---
+
+## ✅ PROTOCOLO DE VERIFICACIÓN — OBLIGATORIO TRAS CADA CAMBIO
+
+**Al terminar cualquier implementación, SIEMPRE incluir un bloque así:**
+
+---
+
+### 🔍 Qué verificar
+
+Describir exactamente:
+1. **Dónde ir** — ruta URL, panel de Supabase, terminal, etc.
+2. **Qué hacer paso a paso** — clicks, datos a introducir, comandos a ejecutar
+3. **Qué debes VER** si todo va bien (comportamiento esperado ✅)
+4. **Qué NO debes ver** — errores concretos que indicarían fallo ❌
+5. **Qué herramienta usar** — según el tipo de cambio:
+
+| Tipo de cambio | Herramienta de verificación |
+|----------------|----------------------------|
+| UI visual / layout | Navegador → inspeccionar visualmente la página |
+| Error de red / request | Chrome DevTools → pestaña **Network** (F12 → Network) |
+| Error de JS en cliente | Chrome DevTools → pestaña **Console** (F12 → Console) |
+| Server Action / formulario | Enviar el formulario y observar respuesta en pantalla; si falla, revisar **terminal del servidor** (donde corre `npm run dev`) |
+| Supabase DB | Supabase Dashboard → **Table Editor** o **SQL Editor** |
+| Auth / sesión | Chrome DevTools → **Application** → Cookies → buscar `sb-*` |
+| Middleware / redirecciones | Navegar a la ruta directamente en el navegador y observar a dónde redirige |
+| Variables de entorno | Terminal: `echo $NOMBRE_VARIABLE` o revisar Vercel → Settings → Environment Variables |
+| Stripe Webhook | Terminal con `stripe listen` activo → observar los logs de eventos recibidos |
+| Responsive / móvil | Chrome DevTools → icono de dispositivo (Ctrl+Shift+M) → seleccionar iPhone o similar |
+| Accesibilidad | Chrome DevTools → pestaña **Lighthouse** → Accessibility, o extensión **axe DevTools** |
+
+### Ejemplo de bloque de verificación bien escrito
+
+```
+🔍 Cómo verificar este cambio:
+
+1. Arranca el servidor si no está corriendo:
+   → Terminal: npm run dev
+
+2. Abre http://localhost:3000/dashboard/admin/upload en Chrome
+   → Debes ver el formulario de subida de lección (si eres admin)
+   → Si no eres admin, debes ser redirigido a /dashboard ✅
+
+3. Rellena el formulario con datos de prueba y pulsa Guardar:
+   → En pantalla: mensaje verde "¡Lección creada correctamente!" ✅
+   → En Supabase → Table Editor → tabla lessons: debe aparecer la fila ✅
+
+4. Si aparece el mensaje rojo "La base de datos no está preparada":
+   → El schema_v2.sql no se ha ejecutado todavía en Supabase ❌
+   → Fix: Supabase Dashboard → SQL Editor → pegar y ejecutar supabase/schema_v2.sql
+
+5. Si aparece "Error al guardar" sin más detalle:
+   → Abre Chrome DevTools → Console (F12)
+   → Mira el terminal donde corre npm run dev para el error exacto
+```
