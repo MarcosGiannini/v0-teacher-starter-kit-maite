@@ -12,6 +12,40 @@ interface LessonRow {
   description: string | null
   plan_id: string
   duration_s: number | null
+  video_url: string | null
+}
+
+/**
+ * Convierte una URL de YouTube o Vimeo en una URL embebible.
+ * Devuelve null si el formato no es reconocido o la URL no es válida.
+ * Solo acepta YouTube y Vimeo — no pasa URLs arbitrarias al iframe.
+ */
+function getVideoEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url)
+
+    // YouTube: youtube.com/watch?v=ID
+    if (parsed.hostname.includes('youtube.com')) {
+      const id = parsed.searchParams.get('v')
+      if (id) return `https://www.youtube.com/embed/${id}`
+    }
+
+    // YouTube: youtu.be/ID
+    if (parsed.hostname === 'youtu.be') {
+      const id = parsed.pathname.slice(1)
+      if (id) return `https://www.youtube.com/embed/${id}`
+    }
+
+    // Vimeo: vimeo.com/NUMERIC_ID
+    if (parsed.hostname.includes('vimeo.com')) {
+      const id = parsed.pathname.slice(1)
+      if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}`
+    }
+
+    return null
+  } catch {
+    return null
+  }
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -51,11 +85,13 @@ export default async function LessonPage({
   // Obtener lección real desde la tabla `lessons`
   const { data: lesson } = await supabase
     .from('lessons')
-    .select('id, slug, title, description, plan_id, duration_s')
+    .select('id, slug, title, description, plan_id, duration_s, video_url')
     .eq('slug', slug)
     .single<LessonRow>()
 
   if (!lesson) notFound()
+
+  const videoEmbedUrl = lesson.video_url ? getVideoEmbedUrl(lesson.video_url) : null
 
   return (
     <main className="min-h-screen bg-background px-4 py-10">
@@ -92,21 +128,33 @@ export default async function LessonPage({
           )}
         </header>
 
-        {/* Video placeholder */}
-        <div
-          role="img"
-          aria-label={`Vídeo de la lección: ${lesson.title}`}
-          className="relative w-full aspect-video rounded-2xl bg-secondary/20 border border-secondary/30 overflow-hidden flex flex-col items-center justify-center gap-3"
-        >
-          <div className="w-14 h-14 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="h-6 w-6 text-primary fill-current ml-0.5" aria-hidden="true">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+        {/* Vídeo — embed si hay URL, placeholder si no */}
+        {videoEmbedUrl ? (
+          <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-secondary/30">
+            <iframe
+              src={videoEmbedUrl}
+              title={`Vídeo: ${lesson.title}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 h-full w-full"
+            />
           </div>
-          <p className="text-sm text-muted-foreground/60 tracking-wide">
-            Vídeo disponible próximamente
-          </p>
-        </div>
+        ) : (
+          <div
+            role="img"
+            aria-label={`Vídeo de la lección: ${lesson.title}`}
+            className="relative w-full aspect-video rounded-2xl bg-secondary/20 border border-secondary/30 overflow-hidden flex flex-col items-center justify-center gap-3"
+          >
+            <div className="w-14 h-14 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 text-primary fill-current ml-0.5" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <p className="text-sm text-muted-foreground/60 tracking-wide">
+              Vídeo disponible próximamente
+            </p>
+          </div>
+        )}
 
         {/* Apuntes persistidos en Supabase */}
         <LessonNotes lessonId={lesson.id} userId={user.id} />
