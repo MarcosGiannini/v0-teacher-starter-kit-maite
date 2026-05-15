@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { login } from '@/app/auth/actions'
+import { forgotPassword } from '@/app/auth/actions'
 
-export default async function LoginPage({
+export default async function ForgotPasswordPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -22,7 +22,7 @@ export default async function LoginPage({
             <Link href="/" className="hover:text-primary transition-colors">Super Teacher</Link>
           </h1>
           <p className="text-sm text-muted-foreground">
-            Bienvenida de nuevo, Maite
+            Recupera el acceso a tu cuenta
           </p>
         </div>
 
@@ -30,10 +30,10 @@ export default async function LoginPage({
         <Card className="border-border shadow-sm">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="font-serif text-2xl font-light text-foreground">
-              Iniciar sesión
+              Restablecer contraseña
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Accede a tu plataforma de membresía
+              Introduce tu correo y te enviaremos un enlace para crear una nueva contraseña.
             </CardDescription>
           </CardHeader>
 
@@ -49,60 +49,39 @@ export default async function LoginPage({
               </p>
             )}
 
-            <form action={login} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">
-                  Correo electrónico
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="tu@correo.com"
-                  required
-                  autoComplete="email"
-                  className="bg-input border-border focus-visible:ring-ring"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-foreground">
-                    Contraseña
+            {!message && (
+              <form action={forgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground">
+                    Correo electrónico
                   </Label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-xs text-muted-foreground underline-offset-4 hover:underline hover:text-primary transition-colors"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </Link>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="tu@correo.com"
+                    required
+                    autoComplete="email"
+                    className="bg-input border-border focus-visible:ring-ring"
+                  />
                 </div>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  autoComplete="current-password"
-                  className="bg-input border-border focus-visible:ring-ring"
-                />
-              </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                Entrar
-              </Button>
-            </form>
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  Enviar enlace
+                </Button>
+              </form>
+            )}
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              ¿No tienes cuenta?{' '}
+              ¿Recordaste tu contraseña?{' '}
               <Link
-                href="/signup"
+                href="/login"
                 className="text-primary underline-offset-4 hover:underline font-medium"
               >
-                Regístrate
+                Iniciar sesión
               </Link>
             </p>
           </CardContent>

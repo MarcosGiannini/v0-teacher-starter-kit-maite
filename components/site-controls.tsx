@@ -18,7 +18,7 @@ interface SiteControlsProps {
 }
 
 export function SiteControls({ locale, labels }: SiteControlsProps) {
-  const { theme, setTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -34,7 +34,9 @@ export function SiteControls({ locale, labels }: SiteControlsProps) {
     })
   }
 
-  const isDark = theme === 'dark'
+  // Use resolvedTheme (not theme) so that defaultTheme="system" resolves correctly.
+  // When theme='system' and the OS is dark, theme==='dark' would be false (wrong).
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <div

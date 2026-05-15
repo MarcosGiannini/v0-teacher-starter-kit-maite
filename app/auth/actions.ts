@@ -70,3 +70,30 @@ export async function logout() {
   if (supabase) await supabase.auth.signOut()
   redirect('/')
 }
+
+export async function forgotPassword(formData: FormData) {
+  const email = (formData.get('email') as string | null)?.trim() ?? ''
+
+  if (!email || email.length > 254) {
+    redirect(`/forgot-password?error=${encodeURIComponent('Introduce un correo válido.')}`)
+  }
+
+  const supabase = await createClient()
+
+  if (!supabase) {
+    redirect(`/forgot-password?error=${encodeURIComponent('Servicio no disponible. Configura Supabase en .env.local.')}`)
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
+  })
+
+  if (error) {
+    redirect(`/forgot-password?error=${encodeURIComponent(error.message)}`)
+  }
+
+  // Always show the same success message to avoid email enumeration.
+  redirect(`/forgot-password?message=${encodeURIComponent('Si ese correo está registrado, recibirás un enlace en breve.')}`)
+}
