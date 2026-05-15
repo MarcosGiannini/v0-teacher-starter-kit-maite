@@ -251,7 +251,36 @@ nada en BD ni en código.**
 
 ---
 
+## Smoke test local — 2026-05-15
+
+> Ejecutado en `http://localhost:3000`. Dev server con Turbopack. Node v24.13.0.
+> Supabase de producción (`zbbfwlbgvddyblvorbha.supabase.co`). Stripe NO configurado (OK en dev).
+
+| Escenario | Estado | Detalle |
+|-----------|--------|---------|
+| `/signup` → cuenta nueva | ✅ | Redirect a `/registro-exitoso` correcto |
+| `/login` → dashboard | ✅ | Redirect a `/dashboard` con sesión activa |
+| Dashboard con membresía pendiente | ✅ | Botón "Cerrar sesión" visible; "membresía pendiente" + "Ver planes" correctos |
+| `/forgot-password` → respuesta genérica | ✅ | Mensaje anti-enumeración siempre igual, independiente de si el email existe |
+| Dark mode primer clic | ✅ | Fix `resolvedTheme === 'dark'` — commit `67dadca` |
+
+**Commits introducidos en esta sesión:**
+
+- `67dadca` — `fix: dark mode toggle + add forgot-password page`
+  - `components/site-controls.tsx`: `resolvedTheme` en lugar de `theme`
+  - `app/auth/actions.ts`: nueva acción `forgotPassword()`
+  - `app/forgot-password/page.tsx`: nueva página
+  - `app/login/page.tsx`: link "¿Olvidaste tu contraseña?"
+
+**Notas de entorno:**
+
+- `.env.local` creado localmente (gitignored). Variables Supabase verificadas. Stripe vacío (ok).
+- ⚠️ `SUPABASE_SERVICE_ROLE_KEY` expuesta accidentalmente en chat. **Rotar antes de producción real.**
+- Error TS preexistente `app/api/webhooks/stripe/route.ts:79` (`current_period_end`) — no bloqueante.
+
+---
+
 ## Próxima acción recomendada
 
-> **FASE 6 — Paso 2**: Migrar `LessonNotes` de localStorage → Supabase (`user_notes`).
-> Prerequisito completado: schema_v2 ejecutado en producción (2026-05-05).
+> Decidir entre: (a) demo visual para Maite, (b) auditoría completa ~80 archivos, (c) Stripe/Vercel producción.
+> En cualquier caso, **rotar `SUPABASE_SERVICE_ROLE_KEY`** antes de configurar producción.

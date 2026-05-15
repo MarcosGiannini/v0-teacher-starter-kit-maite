@@ -385,14 +385,15 @@ Componente client `'use client'`. Props: `lessonId: string`.
 
 ---
 
-## 13. Estado del proyecto (2026-05-04)
+## 13. Estado del proyecto (2026-05-15)
 
 ### ✅ Implementado
 - Auth completa (login, signup, logout, dashboard, middleware)
+- **Forgot password**: `/forgot-password` + `forgotPassword()` action (anti-enumeración) — `67dadca`
 - Stripe Checkout + Webhooks (firma, upsert subscriptions)
 - Landing page (Home) con SEO, CTAs dinámicos según estado auth
 - Pricing page con 3 planes (A1/A2 · B1+ · Mentoría)
-- Dark mode (next-themes, tokens OKLCH completos)
+- Dark mode (next-themes, tokens OKLCH completos) — fix `resolvedTheme` en `67dadca`
 - i18n ES/EN (traducciones centralizadas, cookie-based, sin cambio de URL)
 - Accesibilidad: aria-labels, aria-hidden, sr-only, roles semánticos
 - Responsive: breakpoints sm/md, max-w-screen-md/lg, botones full-width en mobile
@@ -404,13 +405,25 @@ Componente client `'use client'`. Props: `lessonId: string`.
 - **Fase 4.5**: Refactor estético — `max-w-6xl`, sección Hero con más aire, grid Profesora 60/40
 - **Fase 5.1**: Middleware admin (`app_metadata.role`), `/dashboard/admin/upload`, `app/actions/create-lesson.ts`
 
+### ✅ Entorno local (2026-05-15)
+- `.env.local` creado y gitignored. `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL` presentes. Stripe vacío (ok en dev).
+- `npm install` ejecutado. `node_modules/.bin/next.cmd` verificado.
+- Dev server en `http://localhost:3000`.
+
+### ✅ Smoke test local (2026-05-15)
+- Signup → `/registro-exitoso` ✅
+- Login → `/dashboard` con sesión activa ✅
+- Dashboard con membresía pendiente y "Cerrar sesión" ✅
+- `/forgot-password` con mensaje anti-enumeración ✅
+- Dark mode primer clic ✅
+
 ### ⏳ Pendiente / Producción
+- ⚠️ **Rotar `SUPABASE_SERVICE_ROLE_KEY`** antes de producción (expuesta accidentalmente en chat)
 - Subir foto real de Maite (reemplazar `<div>` placeholder)
 - Configurar dominio `superteacher.es` en Vercel
 - Reemplazar `STRIPE_WEBHOOK_SECRET` con signing secret real
 - Crear endpoint webhook en Stripe Dashboard (producción)
-- SQL: `ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_user_id_key UNIQUE (user_id);`
-- Ejecutar `supabase/schema_v2.sql` en Supabase SQL Editor (cuando se active la funcionalidad)
 - Asignar `app_metadata.role = 'admin'` a Maite (SQL en sección 5 de este documento)
 - Migrar `LessonNotes` de localStorage a tabla `user_notes` (Fase 6)
 - Poblar tabla `lessons` o conectar CMS real (Sanity recomendado)
