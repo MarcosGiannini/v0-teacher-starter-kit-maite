@@ -169,7 +169,7 @@
 | Configurar dominio `superteacher.es` en Vercel | ⏳ | Marcos | DNS + SSL automático |
 | Reemplazar `STRIPE_WEBHOOK_SECRET` con signing secret real | ⏳ | Marcos | Desde Stripe Dashboard (producción) |
 | Crear endpoint webhook en Stripe Dashboard (prod) | ⏳ | Marcos | URL: `https://superteacher.es/api/webhooks/stripe` |
-| `ALTER TABLE subscriptions ADD CONSTRAINT ... UNIQUE (user_id)` | ⏳ | Marcos | Ejecutar en Supabase SQL Editor si no existe |
+| `ALTER TABLE subscriptions ADD CONSTRAINT ... UNIQUE (user_id)` | ✅ | Marcos | Verificado 2026-05-15: `subscriptions_user_id_key UNIQUE btree (user_id)` existe en producción |
 | Asignar `role = 'admin'` a Maite en Supabase | ⏳ | Marcos | SQL listo — pendiente ejecutar (ver instrucciones abajo) |
 | Ejecutar `supabase/schema_v2.sql` en Supabase | ✅ | Marcos | Ejecutado 2026-05-05 |
 
@@ -203,6 +203,51 @@
 |------------|--------|---------|---------||
 | Error TS2339 `current_period_end` en `app/api/webhooks/stripe/route.ts` | ❌ Pendiente fix | Todos | Propiedad no existe en tipo `Response<Subscription>` de Stripe SDK. Error preexistente, no introducido en Fase 6. No bloquea build de Vercel (tsc --noEmit no se ejecuta en CI). Registrado para arreglar en próxima sesión. |
 | Stripe Checkout falla con "Invalid API Key provided: sk_test_****" | ❌ Bloqueado (entorno) | Codespaces únicamente | `STRIPE_SECRET_KEY` está presente en `.env.local` pero no se carga correctamente en el contexto de la Route Handler durante el desarrollo en Codespaces. Posible causa: variables de entorno no propagadas al proceso de Next.js en el contenedor. **No es una regresión de código. No afecta a Vercel / producción.** Investigar recarga de `next dev` con las variables o uso de `dotenv` explícito. |
+
+---
+
+## Diagnóstico DB base — 2026-05-15
+
+Read-only. Ejecutado en Supabase SQL Editor sobre el proyecto de producción. **No se ha modificado
+nada en BD ni en código.**
+
+### `public.profiles` — verificado
+
+- Existe.
+- Columnas reales (CSV `Supabase Snippet Profiles Table Schema Details.csv`):
+  - `id          uuid                    NOT NULL`
+  - `full_name   text                    NULL`
+  - `avatar_url  text                    NULL`             (extra, no usada por el código)
+  - `created_at  timestamptz             NULL DEFAULT now()` (extra, no usada por el código)
+- RLS habilitada: `rls_enabled = true`, `rls_forced = false`.
+- Policies (todas `authenticated`):
+  - `Users can insert own profile` — INSERT — `with_check (auth.uid() = id)`
+  - `Users can read own profile`   — SELECT — `using (auth.uid() = id)`
+  - `Users can update own profile` — UPDATE — `using/check (auth.uid() = id)`
+- FK `profiles_id_fkey`: `profiles.id → auth.users(id) ON DELETE CASCADE`.
+
+### `public.subscriptions` — verificado
+
+- Existe.
+- Columnas: `id`, `user_id`, `stripe_customer_id`, `stripe_subscription_id`, `plan_id`,
+  `status`, `current_period_end`, `created_at`.
+- UNIQUE: `subscriptions_user_id_key UNIQUE btree (user_id)` — habilita el upsert del webhook.
+
+### Consecuencias
+
+- DB base readiness **OK para smoke test signup/login**.
+- Stripe webhook DB readiness **OK a nivel de tabla/constraint**.
+- NO significa que Stripe/Vercel estén configurados con secretos reales en producción.
+- NO significa que el producto esté listo para producción.
+- NO significa que el smoke test se haya ejecutado.
+
+### Smells no bloqueantes
+
+- `subscriptions.user_id` es nullable en BD. El código nunca escribe NULL. Endurecer a `NOT NULL`
+  en una futura migración, no urgente.
+- `profiles` no está versionada en `supabase/schema_v2.sql`. Existe en producción por una
+  migración previa manual. Considerar añadirla a un futuro `schema_v3.sql` para reproducibilidad,
+  sin tocar el estado actual.
 
 ---
 

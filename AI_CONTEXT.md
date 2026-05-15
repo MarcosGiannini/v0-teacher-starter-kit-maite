@@ -61,6 +61,44 @@ CREATE TABLE subscriptions (
 );
 ```
 > ⚠️ El UNIQUE constraint en `user_id` es obligatorio. Sin él el webhook falla con "no unique constraint matched".
+> ✅ Verificado en producción 2026-05-15: `subscriptions_user_id_key UNIQUE btree (user_id)` presente.
+
+### Tabla `profiles`
+
+> ⚠️ No está versionada en `supabase/schema_v2.sql`. Existe en producción por una migración manual
+> previa. Schema real verificado en Supabase el 2026-05-15.
+
+```sql
+-- Schema real verificado en producción 2026-05-15
+CREATE TABLE profiles (
+  id          uuid        NOT NULL,
+  full_name   text        NULL,
+  avatar_url  text        NULL,                      -- extra, no usada por el código actual
+  created_at  timestamptz NULL DEFAULT now(),        -- extra, no usada por el código actual
+  PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey
+    FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can read own profile" ON profiles
+  FOR SELECT TO authenticated
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE TO authenticated
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+```
+
+- Usada por `app/auth/actions.ts` (INSERT en signup, escribe `id` + `full_name`).
+- Usada por `app/dashboard/page.tsx` (SELECT `full_name` con `eq('id', user.id)`).
+- FK con `ON DELETE CASCADE` garantiza limpieza automática al borrar la cuenta en `auth.users`.
 
 ---
 
