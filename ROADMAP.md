@@ -1,7 +1,7 @@
 # ROADMAP — Super Teacher Platform
 
 > Documento vivo. **Actualizar tras cada cambio.**
-> Última actualización: 2026-05-05 (schema_v2 ejecutado en producción)
+> Última actualización: 2026-05-16 (demo visual enviada a Maite — esperando respuesta)
 > Fuente de verdad técnica complementaria: `AI_CONTEXT.md`
 
 ---
@@ -116,13 +116,13 @@
 
 ---
 
-## FASE 7 — Listado de Lecciones en Dashboard ⏳
+## FASE 7 — Listado de Lecciones en Dashboard ✅
 
 | Tarea | Estado | Notas |
 |-------|--------|-------|
-| Página de listado por plan en `/dashboard` | ⏳ | Actualmente vacío |
-| Poblar tabla `lessons` con contenido real | ⏳ | O conectar CMS (ver Fase 8) |
-| Navegar desde dashboard → lección individual | ⏳ | Enlaza con ruta `/dashboard/leccion/[slug]` |
+| Página de listado por plan en `/dashboard` | ✅ | `app/dashboard/page.tsx` — implementado 2026-05-14 |
+| Poblar tabla `lessons` con contenido real | ⏳ | Espera materiales de Maite (foto, bio, lecciones) |
+| Navegar desde dashboard → lección individual | ✅ | `app/dashboard/leccion/[slug]/page.tsx` |
 | Progreso del alumno (lección completada) | 🔮 | Requiere tabla adicional o columna en `user_notes` |
 
 ---
@@ -161,7 +161,35 @@
 
 ---
 
-## PRODUCCIÓN — Tareas de Configuración ⏳
+## PRÓXIMOS PASOS INMEDIATOS — retomar en cualquier PC
+
+> **Estado al 2026-05-16.** Demo enviada a Maite. Esperando su confirmación de dirección.
+> Contexto completo en `AI CORE`: `dominios/desarrollo/proyectos/super-teacher/README.md`
+
+### No dependen de Maite (hacer primero)
+
+| Prioridad | Tarea | Notas |
+|-----------|-------|-------|
+| 🔴 SEGURIDAD | Rotar `SUPABASE_SERVICE_ROLE_KEY` en Supabase Dashboard | Settings → API → Regenerar |
+| 🔴 SEGURIDAD | Rotar passwords de cuentas de prueba expuestas en chat | `marcosgianninidev@gmail.com` y `marklendersgamer@gmail.com` en Supabase Auth |
+| 🟡 P1 | Configurar dominio `superteacher.es` en Vercel | Dashboard → Domains → Add |
+| 🟡 P1 | Crear endpoint webhook Stripe producción | Stripe → Developers → Webhooks → `https://superteacher.es/api/webhooks/stripe` |
+| 🟡 P1 | Poner `STRIPE_WEBHOOK_SECRET` real en Vercel env vars | Obtener del endpoint creado arriba |
+| 🟡 P1 | Smoke test en producción | signup → login → dashboard en `https://superteacher.es` |
+
+### Dependen de Maite
+
+| Tarea | Espera |
+|-------|--------|
+| Integrar foto real en landing (placeholder Hero) | Foto de Maite (JPG/PNG ≥ 800×1000) |
+| Integrar bio en landing | Bio 3-6 frases ES + EN |
+| Asignar `role = 'admin'` a Maite en Supabase | Email de su cuenta admin |
+| Subir lecciones piloto | 1-2 lecciones de muestra |
+| Generar manual de subida de lecciones | Producción activa + rol admin + flujo verificado |
+
+---
+
+## PRODUCCIÓN — Tareas de Configuración
 
 | Tarea | Estado | Responsable | Notas |
 |-------|--------|-------------|-------|
